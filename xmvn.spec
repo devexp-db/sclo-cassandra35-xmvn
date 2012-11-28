@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -58,10 +58,17 @@ done
 # API documentation
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 
+# /usr/bin/xmvn script
+%jpackage_script org.fedoraproject.maven.Launcher "" "" %{name}/%{name}-launcher:plexus/classworlds %{name} false
+
+# /usr/bin/xmvn-resolve script
+%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve %{name}-resolve true
+
 
 %files
 %doc LICENSE NOTICE
 %doc AUTHORS README
+%{_bindir}/*
 %{_mavenpomdir}/*
 %{_javadir}/%{name}
 %{_mavendepmapfragdir}/%{name}
@@ -71,5 +78,8 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Nov 28 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0-2
+- Add jpackage scripts
+
 * Mon Nov  5 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0-1
 - Initial packaging
