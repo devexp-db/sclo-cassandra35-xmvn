@@ -1,6 +1,6 @@
 Name:           xmvn
-Version:        0
-Release:        2%{?dist}
+Version:        0.0.1
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -78,6 +78,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Nov 29 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.0.1-1
+- Update to upstream version 0.0.1
+
 * Wed Nov 28 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0-2
 - Add jpackage scripts
 
