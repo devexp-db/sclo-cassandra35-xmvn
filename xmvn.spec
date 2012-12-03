@@ -1,12 +1,12 @@
 Name:           xmvn
-Version:        0.0.1
+Version:        0.0.2
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 Group:          Development/Libraries
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
-Source0:        http://mizdebsk.fedorapeople.org/xmvn/%{name}-%{version}.tar.xz
+Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires:  jpackage-utils
 BuildRequires:  maven
@@ -78,6 +78,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Dec  3 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.0.2-1
+- Update to upstream version 0.0.2
+
 * Thu Nov 29 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.0.1-1
 - Update to upstream version 0.0.1
 
