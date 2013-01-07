@@ -1,5 +1,5 @@
 Name:           xmvn
-Version:        0.1.5
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 Group:          Development/Libraries
@@ -78,6 +78,13 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jan  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.2.0-1
+- Update to upstream version 0.2.0
+- New major features: depmaps, compat symlinks, builddep MOJO
+- Install effective POMs for non-POM artifacts
+- Multiple major and minor bugfixes
+- Drop support for resolving artifacts from %%_javajnidir
+
 * Fri Dec  7 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.1.5-1
 - Update to upstream version 0.1.5
 
