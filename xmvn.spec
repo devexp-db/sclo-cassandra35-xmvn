@@ -1,5 +1,5 @@
 Name:           xmvn
-Version:        0.2.1
+Version:        0.2.2
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 Group:          Development/Libraries
@@ -78,6 +78,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Tue Jan  8 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.2.2-1
+- Update to upstream version 0.2.2
+
 * Tue Jan  8 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.2.1-1
 - Update to upstream version 0.2.1
 
