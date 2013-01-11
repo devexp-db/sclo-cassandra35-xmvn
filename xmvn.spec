@@ -1,5 +1,5 @@
 Name:           xmvn
-Version:        0.2.3
+Version:        0.2.4
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 Group:          Development/Libraries
@@ -10,10 +10,12 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 
 BuildRequires:  jpackage-utils
 BuildRequires:  maven
+BuildRequires:  beust-jcommander
 BuildRequires:  plexus-classworlds
 
 Requires:       jpackage-utils
 Requires:       maven
+Requires:       beust-jcommander
 Requires:       plexus-classworlds
 
 %description
@@ -62,7 +64,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %jpackage_script org.fedoraproject.maven.Launcher "" "" %{name}/%{name}-launcher:plexus/classworlds %{name} false
 
 # /usr/bin/xmvn-resolve script
-%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve %{name}-resolve true
+%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander %{name}-resolve true
 
 
 %files
@@ -78,6 +80,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Jan 11 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.2.4-1
+- Update to upstream version 0.2.4
+
 * Wed Jan  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.2.3-1
 - Update to upstream version 0.2.3
 
