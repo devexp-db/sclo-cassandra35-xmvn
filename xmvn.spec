@@ -1,22 +1,21 @@
 Name:           xmvn
-Version:        0.2.6
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
-Group:          Development/Libraries
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
-BuildRequires:  jpackage-utils
-BuildRequires:  maven
+BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  plexus-classworlds
+BuildRequires:  xml-commons-apis
 
-Requires:       jpackage-utils
 Requires:       maven
 Requires:       beust-jcommander
 Requires:       plexus-classworlds
+Requires:       xml-commons-apis
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -26,8 +25,6 @@ creating RPM packages containing Maven artifacts.
 
 %package        javadoc
 Summary:        API documentation for %{name}
-Group:          Documentation
-Requires:       jpackage-utils
 
 %description    javadoc
 This package provides %{summary}.
@@ -36,50 +33,35 @@ This package provides %{summary}.
 %setup -q
 
 %build
-mvn-rpmbuild verify javadoc:aggregate
+%mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
+%mvn_build
 
 %install
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -d -m 755 %{buildroot}%{_javadir}/%{name}
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-
-# POMs, JARs, depmaps
-for dir in $(find -name pom.xml -exec dirname {} \;); do
-    pushd $dir
-    aid=$(sed -n '/^  <artifactId/{s/[^>]*>//;s/<.*//;p}' pom.xml)
-    install -p -m 644 pom.xml %{buildroot}%{_mavenpomdir}/JPP.%{name}-${aid}.pom
-    if [ -f target/*.jar ]; then
-        install -p -m 644 target/*.jar %{buildroot}%{_javadir}/%{name}/${aid}.jar
-        %add_maven_depmap JPP.%{name}-${aid}.pom %{name}/${aid}.jar
-    else
-        %add_maven_depmap JPP.%{name}-${aid}.pom
-    fi
-    popd
-done
-
-# API documentation
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
+%mvn_install
 
 # /usr/bin/xmvn script
 %jpackage_script org.fedoraproject.maven.Launcher "" "" %{name}/%{name}-launcher:plexus/classworlds %{name} false
 
 # /usr/bin/xmvn-resolve script
-%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander %{name}-resolve true
+%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis %{name}-resolve true
 
 
-%files
+%files -f .mfiles
 %doc LICENSE NOTICE
 %doc AUTHORS README
 %{_bindir}/*
-%{_mavenpomdir}/*
-%{_javadir}/%{name}
-%{_mavendepmapfragdir}/%{name}
+%{_datadir}/%{name}
 
-%files javadoc
+%files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
-%{_javadocdir}/%{name}
 
 %changelog
+* Tue Feb  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.3.0-1
+- Update to upstream version 0.3.0
+- Don't rely on JPP symlinks when resolving artifacts
+- Blacklist more artifacts
+- Fix dependencies
+
 * Thu Jan 24 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.2.6-1
 - Update to upstream version 0.2.6
 
