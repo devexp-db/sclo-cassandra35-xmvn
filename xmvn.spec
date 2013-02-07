@@ -1,5 +1,5 @@
 Name:           xmvn
-Version:        0.3.0
+Version:        0.3.1
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
@@ -56,6 +56,9 @@ This package provides %{summary}.
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Feb  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.3.1-1
+- Update to upstream version 0.3.1
+
 * Tue Feb  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.3.0-1
 - Update to upstream version 0.3.0
 - Don't rely on JPP symlinks when resolving artifacts
