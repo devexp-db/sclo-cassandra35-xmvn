@@ -1,11 +1,12 @@
 Name:           xmvn
 Version:        0.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+Patch:          %{name}-effective-pom.patch
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -31,6 +32,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch -p1
 
 %build
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
@@ -56,6 +58,9 @@ This package provides %{summary}.
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Feb 25 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.3.1-2
+- Install effective POMs into a separate directory
+
 * Thu Feb  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.3.1-1
 - Update to upstream version 0.3.1
 
