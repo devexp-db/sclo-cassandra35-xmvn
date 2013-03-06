@@ -1,20 +1,30 @@
 Name:           xmvn
-Version:        0.3.1
-Release:        1%{?dist}
+Version:        0.4.0
+Release:        0.1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
-Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+Source0:        http://mizdebsk.fedorapeople.org/%{name}/%{name}-snapshot.tar.xz
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
+BuildRequires:  guava
 BuildRequires:  plexus-classworlds
+BuildRequires:  plexus-classworlds
+BuildRequires:  plexus-containers-container-default
+BuildRequires:  plexus-utils
+BuildRequires:  xbean
 BuildRequires:  xml-commons-apis
 
 Requires:       maven
 Requires:       beust-jcommander
+Requires:       guava
 Requires:       plexus-classworlds
+Requires:       plexus-classworlds
+Requires:       plexus-containers-container-default
+Requires:       plexus-utils
+Requires:       xbean
 Requires:       xml-commons-apis
 
 %description
@@ -30,11 +40,11 @@ Summary:        API documentation for %{name}
 This package provides %{summary}.
 
 %prep
-%setup -q
+%setup -q -n %{name}-snapshot
 
 %build
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
-%mvn_build
+%mvn_build -f
 
 %install
 %mvn_install
@@ -43,7 +53,7 @@ This package provides %{summary}.
 %jpackage_script org.fedoraproject.maven.Launcher "" "" %{name}/%{name}-launcher:plexus/classworlds %{name} false
 
 # /usr/bin/xmvn-resolve script
-%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis %{name}-resolve true
+%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis:plexus/containers-container-default:plexus/classworlds:plexus/utils:xbean/xbean-reflect:guava %{name}-resolve true
 
 
 %files -f .mfiles
@@ -56,6 +66,9 @@ This package provides %{summary}.
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Mar  6 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.1
+- Update to upstream snapshot of version 0.4.0
+
 * Thu Feb  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.3.1-1
 - Update to upstream version 0.3.1
 
