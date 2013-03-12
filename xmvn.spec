@@ -1,11 +1,12 @@
 Name:           xmvn
 Version:        0.4.0
-Release:        0.2%{?dist}
+Release:        0.3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        http://mizdebsk.fedorapeople.org/%{name}/%{name}-snapshot.tar.xz
+Source1:        %{name}-classworlds.conf
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -44,16 +45,31 @@ This package provides %{summary}.
 
 %build
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
+# Tests are skipped as a workaround for rhbz#911365
 %mvn_build -f
 
 %install
 %mvn_install
 
-# /usr/bin/xmvn script
-%jpackage_script org.fedoraproject.maven.Launcher "" "" %{name}/%{name}-launcher:plexus/classworlds %{name} false
+install -d -m 755 %{buildroot}%{_datadir}/%{name}/bin
+install -d -m 755 %{buildroot}%{_datadir}/%{name}/lib/ext
+install -p -m 644 %{SOURCE1} %{buildroot}%{_datadir}/%{name}/bin/m2.conf
+ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{name}/bin/mvn
+ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{name}/bin/mvnDebug
+ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{name}/bin/mvnyjp
+ln -sf %{_datadir}/maven/conf %{buildroot}%{_datadir}/%{name}/conf
+ln -sf %{_datadir}/maven/boot %{buildroot}%{_datadir}/%{name}/boot
+ln -sf %{_datadir}/maven/lib %{buildroot}%{_datadir}/%{name}/lib/maven
 
 # /usr/bin/xmvn-resolve script
 %jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis:plexus/containers-container-default:plexus/classworlds:plexus/utils:xbean/xbean-reflect:guava %{name}-resolve true
+
+# /usr/bin/xmvn script
+cat <<EOF >%{buildroot}%{_bindir}/%{name}
+#!/bin/sh -e
+export M2_HOME="\${M2_HOME:-%{_datadir}/%{name}}"
+exec mvn "${@}"
+EOF
 
 
 %files -f .mfiles
@@ -66,6 +82,12 @@ This package provides %{summary}.
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Mar 12 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.3
+- Update to new upstream snapshot
+- Create custom /usr/bin/xmvn instead of using %%jpackage_script
+- Mirror maven directory structure
+- Add Plexus Classworlds config file
+
 * Wed Mar  6 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.2
 - Update to newer snapshot
 
