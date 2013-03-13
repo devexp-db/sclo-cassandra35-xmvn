@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.4.0
-Release:        0.3%{?dist}
+Release:        0.4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -68,20 +68,23 @@ ln -sf %{_datadir}/maven/lib %{buildroot}%{_datadir}/%{name}/lib/maven
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
 #!/bin/sh -e
 export M2_HOME="\${M2_HOME:-%{_datadir}/%{name}}"
-exec mvn "${@}"
+exec mvn "\${@}"
 EOF
 
 
 %files -f .mfiles
 %doc LICENSE NOTICE
 %doc AUTHORS README
-%{_bindir}/*
+%attr(755,-,-) %{_bindir}/*
 %{_datadir}/%{name}
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Mar 13 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.4
+- Set proper permissions for scripts in _bindir
+
 * Tue Mar 12 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.3
 - Update to new upstream snapshot
 - Create custom /usr/bin/xmvn instead of using %%jpackage_script
