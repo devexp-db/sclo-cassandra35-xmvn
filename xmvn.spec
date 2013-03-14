@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.4.0
-Release:        0.5%{?dist}
+Release:        0.6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -82,6 +82,9 @@ EOF
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Mar 14 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.6
+- Update to newer snapshot
+
 * Wed Mar 13 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.5
 - Update to newer snapshot
 
