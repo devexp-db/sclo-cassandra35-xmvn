@@ -40,7 +40,7 @@ Summary:        API documentation for %{name}
 This package provides %{summary}.
 
 %prep
-%setup -q -n %{name}-snapshot
+%setup -q
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_xpath_inject pom:project "<dependencies/>"
 #%%pom_add_dep cglib:cglib::test
