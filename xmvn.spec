@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.4.0
-Release:        0.6%{?dist}
+Release:        0.7%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -10,8 +10,8 @@ Source1:        %{name}-classworlds.conf
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
+BuildRequires:  cglib
 BuildRequires:  guava
-BuildRequires:  plexus-classworlds
 BuildRequires:  plexus-classworlds
 BuildRequires:  plexus-containers-container-default
 BuildRequires:  plexus-utils
@@ -21,7 +21,6 @@ BuildRequires:  xml-commons-apis
 Requires:       maven
 Requires:       beust-jcommander
 Requires:       guava
-Requires:       plexus-classworlds
 Requires:       plexus-classworlds
 Requires:       plexus-containers-container-default
 Requires:       plexus-utils
@@ -42,11 +41,13 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n %{name}-snapshot
+# Add cglib test dependency as a workaround for rhbz#911365
+%pom_xpath_inject pom:project "<dependencies/>"
+#%%pom_add_dep cglib:cglib::test
 
 %build
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
-# Tests are skipped as a workaround for rhbz#911365
-%mvn_build -f
+%mvn_build -X
 
 %install
 %mvn_install
@@ -82,6 +83,9 @@ EOF
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Mar 15 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.7
+- Enable tests
+
 * Thu Mar 14 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-0.6
 - Update to newer snapshot
 
