@@ -43,7 +43,7 @@ This package provides %{summary}.
 %setup -q
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_xpath_inject pom:project "<dependencies/>"
-#%%pom_add_dep cglib:cglib::test
+%pom_add_dep cglib:cglib::test
 
 %build
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
