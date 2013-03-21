@@ -1,5 +1,5 @@
 Name:           xmvn
-Version:        0.4.0
+Version:        0.4.1
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
@@ -83,6 +83,9 @@ EOF
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Mar 21 2013 Michal Srb <msrb@redhat.com> - 0.4.1-1
+- Update to upstream version 0.4.1
+
 * Fri Mar 15 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.0-1
 - Update to upstream version 0.4.0
 
