@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -63,7 +63,7 @@ ln -sf %{_datadir}/maven/boot %{buildroot}%{_datadir}/%{name}/boot
 ln -sf %{_datadir}/maven/lib %{buildroot}%{_datadir}/%{name}/lib/maven
 
 # /usr/bin/xmvn-resolve script
-%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis:plexus/containers-container-default:plexus/classworlds:plexus/utils:xbean/xbean-reflect:guava %{name}-resolve true
+%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis:plexus-containers/plexus-container-default:plexus/classworlds:plexus/utils:xbean/xbean-reflect:guava %{name}-resolve true
 
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
@@ -83,6 +83,9 @@ EOF
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Apr 17 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-2
+- Update plexus-containers-container-default JAR location
+
 * Tue Apr  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-1
 - Update to upstream version 0.4.2
 
