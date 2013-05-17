@@ -1,12 +1,15 @@
 Name:           xmvn
 Version:        0.4.2
-Release:        1%{?dist}
+Release:        1.1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 Source1:        %{name}-classworlds.conf
+# Backported upstream fix, will be available in 0.5.0
+# https://github.com/mizdebsk/xmvn/commit/76f2d25c2b6ca4233bda9f5f9c8c8120d3164086
+Patch0001:      0001-Install-MOJO-fix.patch
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -41,6 +44,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch0001 -p1
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_xpath_inject pom:project "<dependencies/>"
 %pom_add_dep cglib:cglib::test
@@ -83,6 +87,9 @@ EOF
 %doc LICENSE NOTICE
 
 %changelog
+* Fri May 17 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-1.1
+- Add patch: install MOJO fix
+
 * Tue Apr  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-1
 - Update to upstream version 0.4.2
 

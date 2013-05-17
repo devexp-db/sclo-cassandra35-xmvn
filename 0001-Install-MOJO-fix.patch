@@ -1,0 +1,27 @@
+From bd88b6fbba3b251ea9b7a47488377e95e3004ab3 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 17 May 2013 07:19:54 +0200
+Subject: [PATCH] Install MOJO fix
+
+Don't attempt to install packages whict are not installable.
+---
+ .../java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java    | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+index 0047366..39e11d5 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+@@ -137,7 +137,8 @@ public class InstallMojo
+                     packages.put( packageName, pkg );
+                 }
+ 
+-                installProject( project, pkg, rule );
++                if ( pkg.isInstallable() )
++                    installProject( project, pkg, rule );
+             }
+ 
+             Path installRoot = Paths.get( settings.getInstallRoot() );
+-- 
+1.8.1.4
+
