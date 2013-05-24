@@ -1,11 +1,14 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+
+# from upstream commit ccc197d to fix NPE
+Patch0:         0001-Be-careful-when-unboxing-Boolean-that-can-be-null.patch
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -41,6 +44,8 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch0 -p1
+
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_add_dep cglib:cglib::test %{name}-core
 
@@ -112,7 +117,7 @@ cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
 %pre
 # we are changing symlink to dir, workaround RPM issues
 for dir in conf boot;do
-[ $1 -eq 1 ] && [ -L %{_datadir}/%{name}/$dir ] && \
+[ $1 -ge 1 ] && [ -L %{_datadir}/%{name}/$dir ] && \
 rm -f %{_datadir}/%{name}/$dir || :
 done
 
@@ -126,6 +131,10 @@ done
 %doc LICENSE NOTICE
 
 %changelog
+* Fri May 24 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-2
+- Fix upgrade path scriptlet
+- Add patch to fix NPE when debugging is disabled
+
 * Fri May 24 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-1
 - Update to upstream version 0.5.0
 
