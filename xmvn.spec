@@ -1,12 +1,14 @@
 Name:           xmvn
-Version:        0.4.2
-Release:        1%{?dist}
+Version:        0.5.0
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
-Source1:        %{name}-classworlds.conf
+
+# from upstream commit ccc197d to fix NPE
+Patch0:         0001-Be-careful-when-unboxing-Boolean-that-can-be-null.patch
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -17,6 +19,7 @@ BuildRequires:  plexus-containers-container-default
 BuildRequires:  plexus-utils
 BuildRequires:  xbean
 BuildRequires:  xml-commons-apis
+BuildRequires:  maven-dependency-plugin
 
 Requires:       maven
 Requires:       beust-jcommander
@@ -41,29 +44,65 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch0 -p1
+
 # Add cglib test dependency as a workaround for rhbz#911365
-%pom_xpath_inject pom:project "<dependencies/>"
-%pom_add_dep cglib:cglib::test
+%pom_add_dep cglib:cglib::test %{name}-core
+
+
+# remove dependency plugin, we provide apache-maven by symlink
+%pom_remove_plugin :maven-dependency-plugin
+# get mavenVersion that is expected
+mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
+           xmvn-parent/pom.xml)
+mkdir -p target/dependency/
+ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
 %build
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
 %mvn_build -X
 
+# let's use generated tarball to copy directory structure
+# workaround for plexus-archiver bug
+# https://github.com/sonatype/plexus-archiver/pull/9
+sed -i '1s:^BZBZ:BZ:' target/*tar.bz2
+tar --delay-directory-restore -xvf target/*tar.bz2
+chmod -R +rwX %{name}-%{version}*
+
+
 %install
 %mvn_install
 
-install -d -m 755 %{buildroot}%{_datadir}/%{name}/bin
-install -d -m 755 %{buildroot}%{_datadir}/%{name}/lib/ext
-install -p -m 644 %{SOURCE1} %{buildroot}%{_datadir}/%{name}/bin/m2.conf
+cp -r %{name}-%version/* %{buildroot}%{_datadir}/%{name}/
 ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{name}/bin/mvn
 ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{name}/bin/mvnDebug
 ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{name}/bin/mvnyjp
-ln -sf %{_datadir}/maven/conf %{buildroot}%{_datadir}/%{name}/conf
-ln -sf %{_datadir}/maven/boot %{buildroot}%{_datadir}/%{name}/boot
-ln -sf %{_datadir}/maven/lib %{buildroot}%{_datadir}/%{name}/lib/maven
 
-# /usr/bin/xmvn-resolve script
-%jpackage_script org.fedoraproject.maven.tools.resolver.ResolverCli "" "" %{name}/%{name}-core:%{name}/%{name}-resolve:beust-jcommander:xml-commons-apis:plexus/containers-container-default:plexus/classworlds:plexus/utils:xbean/xbean-reflect:guava %{name}-resolve true
+
+
+# helper scripts
+install -d -m 755 %{buildroot}%{_bindir}
+install -m 755 xmvn-tools/src/main/bin/tool-script \
+               %{buildroot}%{_datadir}/%{name}/bin/
+
+for tool in subst resolve bisect;do
+    rm %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
+    ln -s tool-script \
+          %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
+
+    cat <<EOF >%{buildroot}%{_bindir}/%{name}-$tool
+#!/bin/sh -e
+exec %{_datadir}/%{name}/bin/%{name}-$tool "\${@}"
+EOF
+    chmod +x %{buildroot}%{_bindir}/%{name}-$tool
+done
+
+# copy over maven lib directory
+cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
+
+# possibly recreate symlinks that can be automated with xmvn-subst
+%{buildroot}%{_datadir}/%{name}/bin/%{name}-subst \
+        %{buildroot}%{_datadir}/%{name}/
 
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
@@ -72,6 +111,15 @@ export M2_HOME="\${M2_HOME:-%{_datadir}/%{name}}"
 exec mvn "\${@}"
 EOF
 
+# make sure our conf is identical to maven so yum won't freak out
+cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
+
+%pre
+# we are changing symlink to dir, workaround RPM issues
+for dir in conf boot;do
+[ $1 -ge 1 ] && [ -L %{_datadir}/%{name}/$dir ] && \
+rm -f %{_datadir}/%{name}/$dir || :
+done
 
 %files -f .mfiles
 %doc LICENSE NOTICE
@@ -83,6 +131,19 @@ EOF
 %doc LICENSE NOTICE
 
 %changelog
+* Fri May 24 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-2
+- Fix upgrade path scriptlet
+- Add patch to fix NPE when debugging is disabled
+
+* Fri May 24 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-1
+- Update to upstream version 0.5.0
+
+* Fri May 17 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-3
+- Add patch: install MOJO fix
+
+* Wed Apr 17 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-2
+- Update plexus-containers-container-default JAR location
+
 * Tue Apr  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.4.2-1
 - Update to upstream version 0.4.2
 
