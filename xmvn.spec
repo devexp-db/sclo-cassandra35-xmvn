@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -114,12 +114,14 @@ EOF
 # make sure our conf is identical to maven so yum won't freak out
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
 
-%pre
-# we are changing symlink to dir, workaround RPM issues
-for dir in conf boot;do
-[ $1 -ge 1 ] && [ -L %{_datadir}/%{name}/$dir ] && \
-rm -f %{_datadir}/%{name}/$dir || :
-done
+%pretrans -p <lua>
+-- we changed symlink to dir in 0.5.0-1, workaround RPM issues
+for key, dir in pairs({"conf", "boot"}) do
+    path = "%{_datadir}/%{name}/" .. dir
+    if posix.readlink(path) then
+       os.remove(path)
+    end
+end
 
 %files -f .mfiles
 %doc LICENSE NOTICE
@@ -131,6 +133,9 @@ done
 %doc LICENSE NOTICE
 
 %changelog
+* Tue May 28 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-3
+- Move pre scriptlet to pretrans and implement in lua
+
 * Fri May 24 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-2
 - Fix upgrade path scriptlet
 - Add patch to fix NPE when debugging is disabled
