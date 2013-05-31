@@ -1,0 +1,34 @@
+From 21994e6933147073498f5609834329e848a1cf99 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 31 May 2013 16:13:58 +0200
+Subject: [PATCH 2/2] Implement desired handling dots in JPP groupId
+
+---
+ .../src/main/java/org/fedoraproject/maven/repository/Layout.java   | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java
+index 3d8c7a5..23cb006 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java
+@@ -105,11 +105,16 @@ public enum Layout
+                 path.append( groupId.replace( '/', '.' ) );
+                 path.append( '-' );
+             }
+-            else
++            else if ( deep )
+             {
+                 path.append( groupId.replace( '.', '/' ) );
+                 path.append( '/' );
+             }
++            else
++            {
++                path.append( groupId );
++                path.append( '/' );
++            }
+         }
+ 
+         path.append( artifactId );
+-- 
+1.8.1.4
+
