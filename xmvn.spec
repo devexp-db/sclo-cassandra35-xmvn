@@ -10,7 +10,8 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 # from upstream commit ccc197d to fix NPE
 Patch0:         0001-Be-careful-when-unboxing-Boolean-that-can-be-null.patch
 
-# from upstream commit f62ca1f to fix handling of packages with dots in groupid
+# from upstream commits f62ca1f and f6b2c9 to fix handling of packages with dots
+# in groupid
 Patch1:         0002-Implement-desired-handling-dots-in-JPP-groupId.patch
 
 
@@ -24,6 +25,7 @@ BuildRequires:  plexus-utils
 BuildRequires:  xbean
 BuildRequires:  xml-commons-apis
 BuildRequires:  maven-dependency-plugin
+BuildRequires:  maven-plugin-build-helper
 
 Requires:       maven
 Requires:       beust-jcommander
