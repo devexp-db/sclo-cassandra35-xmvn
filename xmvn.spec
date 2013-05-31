@@ -26,6 +26,7 @@ BuildRequires:  xbean
 BuildRequires:  xml-commons-apis
 BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
+BuildRequires:  maven-assembly-plugin
 
 Requires:       maven
 Requires:       beust-jcommander
