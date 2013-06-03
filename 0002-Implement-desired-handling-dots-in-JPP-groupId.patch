@@ -1,0 +1,52 @@
+From 77bfaf47ff78d0de7d005dd2185c05c197c717c2 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 31 May 2013 16:13:58 +0200
+Subject: [PATCH 2/2] Implement desired handling dots in JPP groupId
+
+Dots in JPP groupId should not be replaced with slashes
+---
+ .../src/main/java/org/fedoraproject/maven/repository/Layout.java   | 7 ++++++-
+ .../test/java/org/fedoraproject/maven/repository/LayoutTest.java   | 4 ++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java
+index 3d8c7a5..23cb006 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Layout.java
+@@ -105,11 +105,16 @@ public enum Layout
+                 path.append( groupId.replace( '/', '.' ) );
+                 path.append( '-' );
+             }
+-            else
++            else if ( deep )
+             {
+                 path.append( groupId.replace( '.', '/' ) );
+                 path.append( '/' );
+             }
++            else
++            {
++                path.append( groupId );
++                path.append( '/' );
++            }
+         }
+ 
+         path.append( artifactId );
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java
+index 5f63969..f2330f0 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java
+@@ -42,9 +42,9 @@ public class LayoutTest
+ 
+         assertEquals( "an-example/artifact/used-FOR42.testing/blah-1.2.3-foo/used-FOR42.testing-blah-1.2.3-foo.ext-ens.ion",
+                       Layout.MAVEN.getArtifactPath( artifact ) );
+-        assertEquals( "an-example/artifact/used-FOR42.testing-blah-1.2.3-foo.ext-ens.ion",
++        assertEquals( "an-example.artifact/used-FOR42.testing-blah-1.2.3-foo.ext-ens.ion",
+                       Layout.JPP.getArtifactPath( artifact ) );
+-        assertEquals( "an-example/artifact/used-FOR42.testing.ext-ens.ion",
++        assertEquals( "an-example.artifact/used-FOR42.testing.ext-ens.ion",
+                       Layout.JPP_VERSIONLESS.getArtifactPath( artifact ) );
+         assertEquals( "an-example.artifact-used-FOR42.testing-blah-1.2.3-foo.ext-ens.ion",
+                       Layout.FLAT.getArtifactPath( artifact ) );
+-- 
+1.8.1.4
+

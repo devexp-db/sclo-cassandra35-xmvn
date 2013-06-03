@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -9,6 +9,11 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 
 # from upstream commit ccc197d to fix NPE
 Patch0:         0001-Be-careful-when-unboxing-Boolean-that-can-be-null.patch
+
+# from upstream commits f62ca1f and f6b2c9 to fix handling of packages with dots
+# in groupid
+Patch1:         0002-Implement-desired-handling-dots-in-JPP-groupId.patch
+
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -20,6 +25,8 @@ BuildRequires:  plexus-utils
 BuildRequires:  xbean
 BuildRequires:  xml-commons-apis
 BuildRequires:  maven-dependency-plugin
+BuildRequires:  maven-plugin-build-helper
+BuildRequires:  maven-assembly-plugin
 
 Requires:       maven
 Requires:       beust-jcommander
@@ -45,6 +52,7 @@ This package provides %{summary}.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_add_dep cglib:cglib::test %{name}-core
@@ -114,12 +122,14 @@ EOF
 # make sure our conf is identical to maven so yum won't freak out
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
 
-%pre
-# we are changing symlink to dir, workaround RPM issues
-for dir in conf boot;do
-[ $1 -ge 1 ] && [ -L %{_datadir}/%{name}/$dir ] && \
-rm -f %{_datadir}/%{name}/$dir || :
-done
+%pretrans -p <lua>
+-- we changed symlink to dir in 0.5.0-1, workaround RPM issues
+for key, dir in pairs({"conf", "boot"}) do
+    path = "%{_datadir}/%{name}/" .. dir
+    if posix.readlink(path) then
+       os.remove(path)
+    end
+end
 
 %files -f .mfiles
 %doc LICENSE NOTICE
@@ -131,6 +141,13 @@ done
 %doc LICENSE NOTICE
 
 %changelog
+* Fri May 31 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-4
+- Fix handling of packages with dots in groupId
+- Previous versions also fixed bug #948731
+
+* Tue May 28 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-3
+- Move pre scriptlet to pretrans and implement in lua
+
 * Fri May 24 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-2
 - Fix upgrade path scriptlet
 - Add patch to fix NPE when debugging is disabled
