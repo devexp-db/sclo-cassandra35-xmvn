@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -13,6 +13,10 @@ Patch0:         0001-Be-careful-when-unboxing-Boolean-that-can-be-null.patch
 # from upstream commits f62ca1f and f6b2c9 to fix handling of packages with dots
 # in groupid
 Patch1:         0002-Implement-desired-handling-dots-in-JPP-groupId.patch
+
+# from upstream commits 44d9c60 and bf7b9a7 to allow resolution
+# of tools.jar without specifying system scope or systemPath
+Patch2:         0003-Implement-Java-home-resolver.patch
 
 
 BuildRequires:  maven-local
@@ -53,6 +57,7 @@ This package provides %{summary}.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_add_dep cglib:cglib::test %{name}-core
@@ -141,6 +146,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Jun  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-5
+- Fix resolution of tools.jar
+
 * Fri May 31 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-4
 - Fix handling of packages with dots in groupId
 - Previous versions also fixed bug #948731
