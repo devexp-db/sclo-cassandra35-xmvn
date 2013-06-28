@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -141,6 +141,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Jun 28 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-5
+- Rebuild to regenerate API documentation
+- Resolves: CVE-2013-1571
+
 * Fri May 31 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-4
 - Fix handling of packages with dots in groupId
 - Previous versions also fixed bug #948731
