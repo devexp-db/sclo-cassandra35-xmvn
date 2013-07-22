@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -19,6 +19,9 @@ Patch1:         0002-Implement-desired-handling-dots-in-JPP-groupId.patch
 Patch2:         0003-Implement-Java-home-resolver.patch
 
 
+# Since this version maven uses sonatype-aether symlinks
+BuildRequires:  maven >= 3.0.5-8
+
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -32,7 +35,7 @@ BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 
-Requires:       maven
+Requires:       maven >= 3.0.5-8
 Requires:       beust-jcommander
 Requires:       guava
 Requires:       plexus-classworlds
@@ -75,10 +78,6 @@ ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
 %mvn_build -X
 
-# let's use generated tarball to copy directory structure
-# workaround for plexus-archiver bug
-# https://github.com/sonatype/plexus-archiver/pull/9
-sed -i '1s:^BZBZ:BZ:' target/*tar.bz2
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{name}-%{version}*
 
@@ -117,6 +116,11 @@ cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 %{buildroot}%{_datadir}/%{name}/bin/%{name}-subst \
         %{buildroot}%{_datadir}/%{name}/
 
+for mod in api connector-wagon impl spi util; do
+    ln -sf %{_javadir}/sonatype-aether/aether-$mod.jar \
+       %{buildroot}%{_datadir}/%{name}/lib/sonatype-aether_aether-$mod.jar
+done
+
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
 #!/bin/sh -e
@@ -146,6 +150,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Jul 22 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-6
+- Remove workaround for plexus-archiver bug
+- Use sonatype-aether symlinks
+
 * Wed Jun  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-5
 - Fix resolution of tools.jar
 
