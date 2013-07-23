@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -17,6 +17,9 @@ Patch1:         0002-Implement-desired-handling-dots-in-JPP-groupId.patch
 # from upstream commits 44d9c60 and bf7b9a7 to allow resolution
 # of tools.jar without specifying system scope or systemPath
 Patch2:         0003-Implement-Java-home-resolver.patch
+
+# Allow installation of Eclipse plugins in javadir
+Patch3:         %{name}-eclipse-plugin.patch
 
 
 # Since this version maven uses sonatype-aether symlinks
@@ -61,6 +64,7 @@ This package provides %{summary}.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3
 
 # Add cglib test dependency as a workaround for rhbz#911365
 %pom_add_dep cglib:cglib::test %{name}-core
@@ -150,6 +154,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-7
+- Allow installation of Eclipse plugins in javadir
+
 * Mon Jul 22 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-6
 - Remove workaround for plexus-archiver bug
 - Use sonatype-aether symlinks
