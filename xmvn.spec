@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -23,30 +23,14 @@ Patch3:         %{name}-eclipse-plugin.patch
 
 
 BuildRequires:  maven >= 3.1.0
-# XXX temporary BR on aether POM
-BuildRequires:  aether >= 1:0
-
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
-BuildRequires:  guava
-BuildRequires:  plexus-classworlds
-BuildRequires:  plexus-containers-container-default
-BuildRequires:  plexus-utils
-BuildRequires:  xbean
-BuildRequires:  xml-commons-apis
 BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 
-Requires:       maven >= 3.0.5-8
-Requires:       beust-jcommander
-Requires:       guava
-Requires:       plexus-classworlds
-Requires:       plexus-containers-container-default
-Requires:       plexus-utils
-Requires:       xbean
-Requires:       xml-commons-apis
+Requires:       maven >= 3.1.0
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -80,18 +64,6 @@ mkdir -p target/dependency/
 ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
 %build
-# Bootstrap XMvn Connector
-export M2_HOME=$PWD/m2
-cp -prL %{_datadir}/maven $M2_HOME
-cp %{_datadir}/xmvn/lib/xmvn-{core,connector}.jar $M2_HOME/lib/ext
-mkdir dir
-javac -cp `build-classpath maven aether org.eclipse.sisu.plexus plexus xmvn/xmvn-core` `find xmvn-connector -name *.java` -d dir
-(cd ./dir
-jar xf $M2_HOME/lib/ext/xmvn-connector.jar META-INF/plexus/components.xml
-sed -i s/sonatype/eclipse/ META-INF/plexus/components.xml
-jar uf $M2_HOME/lib/ext/xmvn-connector.jar *
-)
-
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
 %mvn_build -X
 
@@ -169,6 +141,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-3
+- Rebuild without bootstrapping
+
 * Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-2
 - Install symlink to simplelogger.properties in %{_sysconfdir}
 
