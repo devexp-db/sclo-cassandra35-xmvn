@@ -22,8 +22,9 @@ Patch2:         0003-Implement-Java-home-resolver.patch
 Patch3:         %{name}-eclipse-plugin.patch
 
 
-# Since this version maven uses sonatype-aether symlinks
-BuildRequires:  maven >= 3.0.5-8
+BuildRequires:  maven >= 3.1.0
+# XXX temporary BR on aether POM
+BuildRequires:  aether >= 1:0
 
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
@@ -79,6 +80,18 @@ mkdir -p target/dependency/
 ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
 %build
+# Bootstrap XMvn Connector
+export M2_HOME=$PWD/m2
+cp -prL %{_datadir}/maven $M2_HOME
+cp %{_datadir}/xmvn/lib/xmvn-{core,connector}.jar $M2_HOME/lib/ext
+mkdir dir
+javac -cp `build-classpath maven aether org.eclipse.sisu.plexus plexus xmvn/xmvn-core` `find xmvn-connector -name *.java` -d dir
+(cd ./dir
+jar xf $M2_HOME/lib/ext/xmvn-connector.jar META-INF/plexus/components.xml
+sed -i s/sonatype/eclipse/ META-INF/plexus/components.xml
+jar uf $M2_HOME/lib/ext/xmvn-connector.jar *
+)
+
 %mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
 %mvn_build -X
 
