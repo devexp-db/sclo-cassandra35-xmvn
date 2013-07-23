@@ -1,6 +1,6 @@
 Name:           xmvn
-Version:        0.5.0
-Release:        7%{?dist}
+Version:        0.5.1
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -121,8 +121,8 @@ cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
         %{buildroot}%{_datadir}/%{name}/
 
 for mod in api connector-wagon impl spi util; do
-    ln -sf %{_javadir}/sonatype-aether/aether-$mod.jar \
-       %{buildroot}%{_datadir}/%{name}/lib/sonatype-aether_aether-$mod.jar
+    ln -sf %{_javadir}/aether/aether-$mod.jar \
+       %{buildroot}%{_datadir}/%{name}/lib/aether_aether-$mod.jar
 done
 
 # /usr/bin/xmvn script
@@ -154,6 +154,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-1
+- Update to upstream version 0.5.1
+
 * Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-7
 - Allow installation of Eclipse plugins in javadir
 
