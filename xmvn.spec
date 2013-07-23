@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        0.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -138,6 +138,8 @@ for mod in api connector-wagon impl spi util; do
        %{buildroot}%{_datadir}/%{name}/lib/aether_aether-$mod.jar
 done
 
+ln -s %{_sysconfdir}/maven/logging %{buildroot}%{_datadir}/%{name}/conf
+
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
 #!/bin/sh -e
@@ -167,6 +169,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-2
+- Install symlink to simplelogger.properties in %{_sysconfdir}
+
 * Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-1
 - Update to upstream version 0.5.1
 
