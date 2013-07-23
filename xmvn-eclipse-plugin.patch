@@ -1,0 +1,11 @@
+--- xmvn-core/src/main/java/org/fedoraproject/maven/installer/JarInstaller.java~	2013-05-24 10:12:18.000000000 +0200
++++ xmvn-core/src/main/java/org/fedoraproject/maven/installer/JarInstaller.java	2013-07-23 07:58:47.020084935 +0200
+@@ -43,7 +43,7 @@
+     @Override
+     public List<String> getSupportedPackagingTypes()
+     {
+-        return Arrays.asList( "bundle", "ejb", "jar", "maven-plugin" );
++        return Arrays.asList( "bundle", "eclipse-plugin", "ejb", "jar", "maven-plugin" );
+     }
+ 
+     @Override
