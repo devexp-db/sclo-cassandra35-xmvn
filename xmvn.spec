@@ -7,6 +7,8 @@ URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 Patch0:         0001-Don-t-try-to-relativize-symlink-targets.patch
+Patch1:         0002-Try-to-resolve-cannonical-artifact-files.patch
+Patch2:         0003-Restotre-support-for-relative-symlinks.patch
 
 BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
@@ -34,6 +36,8 @@ This package provides %{summary}.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
 
 # Add cglib test dependency as a workaround for rhbz#911365
 #pom_add_dep cglib:cglib::test %{name}-core
@@ -145,6 +149,7 @@ end
 %changelog
 * Mon Sep 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-2
 - Don't try to relativize symlink targets
+- Restotre support for relative symlinks
 
 * Fri Sep 20 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-1
 - Update to upstream version 1.0.2
