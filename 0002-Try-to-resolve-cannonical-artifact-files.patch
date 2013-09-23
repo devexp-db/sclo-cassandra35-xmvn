@@ -1,0 +1,32 @@
+From 48a8417d29b0e8f1b4f5c61281a9b5502e6c4913 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 23 Sep 2013 17:29:28 +0200
+Subject: [PATCH 2/3] Try to resolve cannonical artifact files
+
+---
+ .../java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java     | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java
+index 6bbd26b..9fc61c7 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java
+@@ -46,6 +46,7 @@ import org.fedoraproject.maven.resolver.ResolutionResult;
+ import org.fedoraproject.maven.resolver.Resolver;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ import org.fedoraproject.maven.utils.AtomicFileCounter;
++import org.fedoraproject.maven.utils.FileUtils;
+ import org.fedoraproject.maven.utils.LoggingUtils;
+ 
+ /**
+@@ -241,6 +242,7 @@ public class DefaultResolver
+         }
+ 
+         File artifactFile = result.getArtifactFile();
++        artifactFile = FileUtils.followSymlink( artifactFile );
+         logger.debug( "Artifact " + artifact + " was resolved to " + artifactFile );
+         if ( request.isProviderNeeded() )
+             result.setProvider( rpmdb.lookupFile( artifactFile ) );
+-- 
+1.8.1.4
+
