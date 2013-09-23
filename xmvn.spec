@@ -1,11 +1,12 @@
 Name:           xmvn
 Version:        1.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+Patch0:         0001-Don-t-try-to-relativize-symlink-targets.patch
 
 BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
@@ -32,6 +33,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch0 -p1
 
 # Add cglib test dependency as a workaround for rhbz#911365
 #pom_add_dep cglib:cglib::test %{name}-core
@@ -53,7 +55,6 @@ ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 rm -rf src/it
 
 %build
-%mvn_file ":{xmvn-{core,connector}}" %{name}/@1 ../%{name}/lib/@1
 %mvn_build -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
@@ -63,6 +64,7 @@ chmod -R +rwX %{name}-%{version}*
 %install
 %mvn_install
 
+install -d -m 755 %{buildroot}%{_datadir}/%{name}
 cp -r %{name}-%{version}*/* %{buildroot}%{_datadir}/%{name}/
 ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{name}/bin/mvn
 ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{name}/bin/mvnDebug
@@ -90,11 +92,11 @@ done
 # copy over maven lib directory
 cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 
+# possibly recreate symlinks that can be automated with xmvn-subst
+%{name}-subst %{buildroot}%{_datadir}/%{name}/
 for jar in core connector;do
     ln -sf %{_javadir}/%{name}/%{name}-$jar.jar %{buildroot}%{_datadir}/%{name}/lib
 done
-# possibly recreate symlinks that can be automated with xmvn-subst
-%{name}-subst %{buildroot}%{_datadir}/%{name}/
 
 for tool in subst resolver bisect installer;do
     # sisu doesn't contain pom.properties. Manually replace with symlinks
@@ -141,6 +143,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Sep 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-2
+- Don't try to relativize symlink targets
+
 * Fri Sep 20 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-1
 - Update to upstream version 1.0.2
 
