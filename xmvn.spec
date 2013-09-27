@@ -41,11 +41,6 @@ This package provides %{summary}.
 %patch2 -p1
 %patch3 -p1
 
-# Add cglib test dependency as a workaround for rhbz#911365
-#pom_add_dep cglib:cglib::test %{name}-core
-%pom_add_dep cglib:cglib %{name}-core
-%pom_add_dep aopalliance:aopalliance %{name}-core
-
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
 %pom_xpath_remove "pom:executions/pom:execution[pom:id[text()='maven-binaries']]"
@@ -110,9 +105,14 @@ for tool in subst resolver bisect installer;do
         rm org.eclipse.sisu*jar sisu-guice*jar
         build-jar-repository . org.eclipse.sisu.inject \
                                org.eclipse.sisu.plexus \
-                               guice/google-guice
+                               guice/google-guice-no_aop
     popd
 done
+
+# workaround for rhbz#1012982
+rm %{buildroot}%{_datadir}/%{name}/lib/google-guice-no_aop.jar
+build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ \
+                     guice/google-guice-no_aop
 
 if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
     echo "Some jar files were not symlinked during build. Aborting"
