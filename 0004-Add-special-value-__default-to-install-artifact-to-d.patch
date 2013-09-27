@@ -1,0 +1,35 @@
+From b922db6aafe2c3680ab0cd340bb63f4b355993f5 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 27 Sep 2013 14:53:35 +0200
+Subject: [PATCH] Add special value __default to install artifact to default
+ package
+
+---
+ .../src/main/java/org/fedoraproject/maven/installer/impl/Package.java | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
+index d0e33ba..0038e89 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
+@@ -43,6 +43,8 @@ class Package
+ 
+     public static final String MAIN = "";
+ 
++    private static final String DEFAULT_SUFFIX = "__default";
++
+     private static final String NOINSTALL_SUFFIX = "__noinstall";
+ 
+     private boolean pureDevelPackage = true;
+@@ -53,7 +55,7 @@ class Package
+     {
+         this.settings = settings;
+         metadata = new FragmentFile( logger );
+-        suffix = name.equals( "" ) ? "" : "-" + name;
++        suffix = ( name.equals( "" ) || name.equals( DEFAULT_SUFFIX ) ) ? "" : "-" + name;
+     }
+ 
+     private final FragmentFile metadata;
+-- 
+1.8.3.1
+
