@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -9,6 +9,7 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 Patch0:         0001-Don-t-try-to-relativize-symlink-targets.patch
 Patch1:         0002-Try-to-resolve-cannonical-artifact-files.patch
 Patch2:         0003-Restotre-support-for-relative-symlinks.patch
+Patch3:         0004-Add-special-value-__default-to-install-artifact-to-d.patch
 
 BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
@@ -38,6 +39,7 @@ This package provides %{summary}.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 # Add cglib test dependency as a workaround for rhbz#911365
 #pom_add_dep cglib:cglib::test %{name}-core
@@ -147,6 +149,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Sep 27 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.0.2-3
+- Add __default package specifier support
+
 * Mon Sep 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-2
 - Don't try to relativize symlink targets
 - Restotre support for relative symlinks
