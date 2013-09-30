@@ -10,6 +10,7 @@ Patch0:         0001-Don-t-try-to-relativize-symlink-targets.patch
 Patch1:         0002-Try-to-resolve-cannonical-artifact-files.patch
 Patch2:         0003-Restotre-support-for-relative-symlinks.patch
 Patch3:         0004-Add-special-value-__default-to-install-artifact-to-d.patch
+Patch4:         0005-Don-t-assume-package-has-a-single-name.patch
 
 BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
@@ -40,6 +41,7 @@ This package provides %{summary}.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1 -F2
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
