@@ -1,16 +1,11 @@
 Name:           xmvn
-Version:        1.0.2
-Release:        3%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
-Patch0:         0001-Don-t-try-to-relativize-symlink-targets.patch
-Patch1:         0002-Try-to-resolve-cannonical-artifact-files.patch
-Patch2:         0003-Restotre-support-for-relative-symlinks.patch
-Patch3:         0004-Add-special-value-__default-to-install-artifact-to-d.patch
-Patch4:         0005-Don-t-assume-package-has-a-single-name.patch
 
 BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
@@ -37,11 +32,6 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1 -F2
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -151,6 +141,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Oct 01 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.1.0-1
+- Update to upstream version 1.1.0
+
 * Fri Sep 27 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.0.2-3
 - Add __default package specifier support
 
