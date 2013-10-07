@@ -1,41 +1,22 @@
 Name:           xmvn
-Version:        0.5.0
-Release:        5%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
-# from upstream commit ccc197d to fix NPE
-Patch0:         0001-Be-careful-when-unboxing-Boolean-that-can-be-null.patch
-
-# from upstream commits f62ca1f and f6b2c9 to fix handling of packages with dots
-# in groupid
-Patch1:         0002-Implement-desired-handling-dots-in-JPP-groupId.patch
-
-
+BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
-BuildRequires:  guava
-BuildRequires:  plexus-classworlds
-BuildRequires:  plexus-containers-container-default
-BuildRequires:  plexus-utils
-BuildRequires:  xbean
-BuildRequires:  xml-commons-apis
 BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
+BuildRequires:  maven-invoker-plugin
 
-Requires:       maven
-Requires:       beust-jcommander
-Requires:       guava
-Requires:       plexus-classworlds
-Requires:       plexus-containers-container-default
-Requires:       plexus-utils
-Requires:       xbean
-Requires:       xml-commons-apis
+Requires:       maven >= 3.1.0
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -51,29 +32,24 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
 
-# Add cglib test dependency as a workaround for rhbz#911365
-%pom_add_dep cglib:cglib::test %{name}-core
+# remove dependency plugin maven-binaries execution
+# we provide apache-maven by symlink
+%pom_xpath_remove "pom:executions/pom:execution[pom:id[text()='maven-binaries']]"
 
-
-# remove dependency plugin, we provide apache-maven by symlink
-%pom_remove_plugin :maven-dependency-plugin
 # get mavenVersion that is expected
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
 ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
+
+# skip ITs for now (mix of old & new XMvn config causes issues
+rm -rf src/it
+
 %build
-%mvn_file ":{xmvn-{core,connector}}" %{name}/@1 %{_datadir}/%{name}/lib/@1
 %mvn_build -X
 
-# let's use generated tarball to copy directory structure
-# workaround for plexus-archiver bug
-# https://github.com/sonatype/plexus-archiver/pull/9
-sed -i '1s:^BZBZ:BZ:' target/*tar.bz2
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{name}-%{version}*
 
@@ -81,11 +57,11 @@ chmod -R +rwX %{name}-%{version}*
 %install
 %mvn_install
 
-cp -r %{name}-%version/* %{buildroot}%{_datadir}/%{name}/
+install -d -m 755 %{buildroot}%{_datadir}/%{name}
+cp -r %{name}-%{version}*/* %{buildroot}%{_datadir}/%{name}/
 ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{name}/bin/mvn
 ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{name}/bin/mvnDebug
 ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{name}/bin/mvnyjp
-
 
 
 # helper scripts
@@ -93,7 +69,7 @@ install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 xmvn-tools/src/main/bin/tool-script \
                %{buildroot}%{_datadir}/%{name}/bin/
 
-for tool in subst resolve bisect;do
+for tool in subst resolve bisect install;do
     rm %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
     ln -s tool-script \
           %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
@@ -103,14 +79,38 @@ for tool in subst resolve bisect;do
 exec %{_datadir}/%{name}/bin/%{name}-$tool "\${@}"
 EOF
     chmod +x %{buildroot}%{_bindir}/%{name}-$tool
+
 done
 
 # copy over maven lib directory
 cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
-%{buildroot}%{_datadir}/%{name}/bin/%{name}-subst \
-        %{buildroot}%{_datadir}/%{name}/
+%{name}-subst %{buildroot}%{_datadir}/%{name}/
+for jar in core connector;do
+    ln -sf %{_javadir}/%{name}/%{name}-$jar.jar %{buildroot}%{_datadir}/%{name}/lib
+done
+
+for tool in subst resolver bisect installer;do
+    # sisu doesn't contain pom.properties. Manually replace with symlinks
+    pushd %{buildroot}%{_datadir}/%{name}/lib/$tool
+        rm org.eclipse.sisu*jar sisu-guice*jar
+        build-jar-repository . org.eclipse.sisu.inject \
+                               org.eclipse.sisu.plexus \
+                               guice/google-guice-no_aop
+    popd
+done
+
+# workaround for rhbz#1012982
+rm %{buildroot}%{_datadir}/%{name}/lib/google-guice-no_aop.jar
+build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ \
+                     guice/google-guice-no_aop
+
+if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
+    echo "Some jar files were not symlinked during build. Aborting"
+    exit 1
+fi
+
 
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
@@ -124,7 +124,7 @@ cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
-for key, dir in pairs({"conf", "boot"}) do
+for key, dir in pairs({"conf", "conf/logging", "boot"}) do
     path = "%{_datadir}/%{name}/" .. dir
     if posix.readlink(path) then
        os.remove(path)
@@ -141,9 +141,53 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Oct 01 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.1.0-1
+- Update to upstream version 1.1.0
+
+* Fri Sep 27 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.0.2-3
+- Add __default package specifier support
+
+* Mon Sep 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-2
+- Don't try to relativize symlink targets
+- Restotre support for relative symlinks
+
+* Fri Sep 20 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.2-1
+- Update to upstream version 1.0.2
+
+* Tue Sep 10 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.0.0-2
+- Workaround broken symlinks for core and connector (#986909)
+
+* Mon Sep 09 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.0.0-1
+- Updating to upstream 1.0.0
+
+* Tue Sep  3 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> 1.0.0-0.2.alpha1
+- Update to upstream version 1.0.0 alpha1
+
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.5.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-3
+- Rebuild without bootstrapping
+
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-2
+- Install symlink to simplelogger.properties in %{_sysconfdir}
+
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.1-1
+- Update to upstream version 0.5.1
+
+* Tue Jul 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-7
+- Allow installation of Eclipse plugins in javadir
+
+* Mon Jul 22 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-6
+- Remove workaround for plexus-archiver bug
+- Use sonatype-aether symlinks
+
 * Fri Jun 28 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-5
 - Rebuild to regenerate API documentation
 - Resolves: CVE-2013-1571
+
+* Wed Jun  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0.5.0-5
+- Fix resolution of tools.jar
 
 * Fri May 31 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.5.0-4
 - Fix handling of packages with dots in groupId
