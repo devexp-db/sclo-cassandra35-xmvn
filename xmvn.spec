@@ -7,7 +7,9 @@ URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
-BuildRequires:  maven >= 3.1.0
+Patch1:         0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
+
+BuildRequires:  maven >= 3.0.5
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -16,7 +18,7 @@ BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
 
-Requires:       maven >= 3.1.0
+Requires:       maven >= 3.0.5
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -32,6 +34,12 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch1 -p1
+
+# Add cglib test dependency as a workaround for rhbz#911365
+# Can be removed after guice rebuild with no_aop
+%pom_add_dep cglib:cglib %{name}-core
+%pom_add_dep aopalliance:aopalliance %{name}-core
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -94,22 +102,21 @@ done
 for tool in subst resolver bisect installer;do
     # sisu doesn't contain pom.properties. Manually replace with symlinks
     pushd %{buildroot}%{_datadir}/%{name}/lib/$tool
-        rm org.eclipse.sisu*jar sisu-guice*jar
-        build-jar-repository . org.eclipse.sisu.inject \
-                               org.eclipse.sisu.plexus \
-                               guice/google-guice-no_aop
+        build-jar-repository . guice/google-guice
     popd
 done
 
 # workaround for rhbz#1012982
-rm %{buildroot}%{_datadir}/%{name}/lib/google-guice-no_aop.jar
-build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ \
-                     guice/google-guice-no_aop
+# only when guice has no_aop version compiled
+#rm %{buildroot}%{_datadir}/%{name}/lib/google-guice-no_aop.jar
+#build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ \
+#                     guice/google-guice-no_aop
 
-if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
-    echo "Some jar files were not symlinked during build. Aborting"
-    exit 1
-fi
+# reenable after build
+#if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
+#    echo "Some jar files were not symlinked during build. Aborting"
+#    exit 1
+#fi
 
 
 # /usr/bin/xmvn script

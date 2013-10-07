@@ -1,0 +1,777 @@
+From 902cba3888ac2cbb46556cfc1dac6f659d4ced62 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 3 Oct 2013 16:12:13 +0200
+Subject: [PATCH] Port to Maven 3.0.5 and Sonatype Aether
+
+---
+ xmvn-connector/pom.xml                                  |  6 +++---
+ .../maven/connector/FedoraPluginVersionResolver.java    |  6 +++---
+ .../maven/connector/FedoraWorkspaceReader.java          |  6 +++---
+ xmvn-core/pom.xml                                       | 10 +++++++---
+ .../maven/dependency/DependencyExtractionResult.java    |  2 +-
+ .../maven/dependency/impl/BuildDependencyVisitor.java   |  4 ++--
+ .../impl/DefaultDependencyExtractionResult.java         |  2 +-
+ .../maven/dependency/impl/RuntimeDependencyVisitor.java |  2 +-
+ .../maven/installer/InstallationRequest.java            |  2 +-
+ .../maven/installer/impl/DefaultInstaller.java          |  4 ++--
+ .../maven/installer/impl/FragmentFile.java              |  2 +-
+ .../org/fedoraproject/maven/installer/impl/Package.java |  4 ++--
+ .../org/fedoraproject/maven/repository/Repository.java  |  2 +-
+ .../maven/repository/impl/CompoundRepository.java       |  2 +-
+ .../maven/repository/impl/SimpleRepository.java         |  2 +-
+ .../fedoraproject/maven/resolver/ArtifactBlacklist.java |  2 +-
+ .../org/fedoraproject/maven/resolver/DependencyMap.java |  2 +-
+ .../fedoraproject/maven/resolver/ResolutionRequest.java |  4 ++--
+ .../java/org/fedoraproject/maven/resolver/Resolver.java |  2 +-
+ .../maven/resolver/impl/DefaultArtifactBlacklist.java   |  4 ++--
+ .../maven/resolver/impl/DefaultDependencyMap.java       |  4 ++--
+ .../maven/resolver/impl/DefaultResolver.java            |  4 ++--
+ .../fedoraproject/maven/resolver/impl/DepmapReader.java |  4 ++--
+ .../org/fedoraproject/maven/utils/ArtifactUtils.java    |  4 ++--
+ .../maven/dependency/AbstractDependencyTest.java        |  4 ++--
+ .../maven/repository/FlatRepositoryTest.java            |  4 ++--
+ .../maven/repository/JppRepositoryTest.java             |  4 ++--
+ .../org/fedoraproject/maven/repository/LayoutTest.java  |  4 ++--
+ .../maven/repository/MavenRepositoryTest.java           |  4 ++--
+ .../fedoraproject/maven/repository/MyRepository.java    |  2 +-
+ .../maven/repository/NestedRepositoriesTest.java        |  4 ++--
+ .../org/fedoraproject/maven/resolver/DepmapTest.java    |  4 ++--
+ xmvn-mojo/pom.xml                                       | 10 +++++++---
+ .../maven/rpminstall/plugin/BuilddepMojo.java           |  2 +-
+ .../maven/rpminstall/plugin/InstallMojo.java            |  4 ++--
+ .../fedoraproject/maven/rpminstall/plugin/Utils.java    |  4 ++--
+ xmvn-parent/pom.xml                                     | 17 +++++++++++------
+ xmvn-tools/pom.xml                                      |  4 ++--
+ xmvn-tools/xmvn-install/pom.xml                         |  6 +++++-
+ .../maven/tools/installer/InstallerCli.java             |  4 ++--
+ xmvn-tools/xmvn-resolve/pom.xml                         |  6 +++++-
+ .../fedoraproject/maven/tools/resolver/ResolverCli.java |  4 ++--
+ xmvn-tools/xmvn-subst/pom.xml                           |  6 +++++-
+ .../maven/tools/subst/ArtifactVisitor.java              |  4 ++--
+ 44 files changed, 106 insertions(+), 81 deletions(-)
+
+diff --git a/xmvn-connector/pom.xml b/xmvn-connector/pom.xml
+index 832a262..261ea08 100644
+--- a/xmvn-connector/pom.xml
++++ b/xmvn-connector/pom.xml
+@@ -56,7 +56,7 @@
+       <artifactId>maven-artifact</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.aether</groupId>
++      <groupId>org.sonatype.aether</groupId>
+       <artifactId>aether-api</artifactId>
+     </dependency>
+     <dependency>
+@@ -72,8 +72,8 @@
+       <artifactId>xmvn-core</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+   </dependencies>
+ </project>
+diff --git a/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraPluginVersionResolver.java b/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraPluginVersionResolver.java
+index f2ef618..729a26d 100644
+--- a/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraPluginVersionResolver.java
++++ b/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraPluginVersionResolver.java
+@@ -19,9 +19,9 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
+ import org.apache.maven.plugin.version.PluginVersionResolver;
+ import org.apache.maven.plugin.version.PluginVersionResult;
+ import org.codehaus.plexus.component.annotations.Component;
+-import org.eclipse.aether.RepositorySystemSession;
+-import org.eclipse.aether.repository.ArtifactRepository;
+-import org.eclipse.aether.repository.WorkspaceReader;
++import org.sonatype.aether.RepositorySystemSession;
++import org.sonatype.aether.repository.ArtifactRepository;
++import org.sonatype.aether.repository.WorkspaceReader;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ 
+ /**
+diff --git a/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraWorkspaceReader.java b/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraWorkspaceReader.java
+index 09499ed..5001878 100644
+--- a/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraWorkspaceReader.java
++++ b/xmvn-connector/src/main/java/org/fedoraproject/maven/connector/FedoraWorkspaceReader.java
+@@ -21,9 +21,9 @@ import java.util.List;
+ 
+ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.repository.WorkspaceReader;
+-import org.eclipse.aether.repository.WorkspaceRepository;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.repository.WorkspaceReader;
++import org.sonatype.aether.repository.WorkspaceRepository;
+ import org.fedoraproject.maven.resolver.ResolutionRequest;
+ import org.fedoraproject.maven.resolver.ResolutionResult;
+ import org.fedoraproject.maven.resolver.Resolver;
+diff --git a/xmvn-core/pom.xml b/xmvn-core/pom.xml
+index 89e1a20..8b6451d 100644
+--- a/xmvn-core/pom.xml
++++ b/xmvn-core/pom.xml
+@@ -34,10 +34,14 @@
+   </description>
+   <dependencies>
+     <dependency>
+-      <groupId>org.eclipse.aether</groupId>
++      <groupId>org.sonatype.aether</groupId>
+       <artifactId>aether-api</artifactId>
+     </dependency>
+     <dependency>
++      <groupId>org.sonatype.aether</groupId>
++      <artifactId>aether-util</artifactId>
++    </dependency>
++    <dependency>
+       <groupId>org.apache.maven</groupId>
+       <artifactId>maven-model</artifactId>
+     </dependency>
+@@ -46,8 +50,8 @@
+       <artifactId>plexus-component-annotations</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>org.codehaus.plexus</groupId>
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/DependencyExtractionResult.java b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/DependencyExtractionResult.java
+index 2c59307..2519655 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/DependencyExtractionResult.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/DependencyExtractionResult.java
+@@ -17,7 +17,7 @@ package org.fedoraproject.maven.dependency;
+ 
+ import java.util.Set;
+ 
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ 
+ /**
+  * @author Mikolaj Izdebski
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/BuildDependencyVisitor.java b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/BuildDependencyVisitor.java
+index 04dff90..542193e 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/BuildDependencyVisitor.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/BuildDependencyVisitor.java
+@@ -25,8 +25,8 @@ import org.apache.maven.model.Extension;
+ import org.apache.maven.model.Parent;
+ import org.apache.maven.model.Plugin;
+ import org.codehaus.plexus.util.StringUtils;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.model.AbstractModelVisitor;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ 
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/DefaultDependencyExtractionResult.java b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/DefaultDependencyExtractionResult.java
+index 1c7171e..cf01272 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/DefaultDependencyExtractionResult.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/DefaultDependencyExtractionResult.java
+@@ -19,7 +19,7 @@ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.dependency.DependencyExtractionResult;
+ 
+ /**
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/RuntimeDependencyVisitor.java b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/RuntimeDependencyVisitor.java
+index 6ef22b9..e2c54a4 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/RuntimeDependencyVisitor.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/dependency/impl/RuntimeDependencyVisitor.java
+@@ -19,7 +19,7 @@ import java.util.Arrays;
+ import java.util.List;
+ 
+ import org.apache.maven.model.Dependency;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.model.AbstractModelVisitor;
+ 
+ /**
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/InstallationRequest.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/InstallationRequest.java
+index 7033704..0f4bfc3 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/InstallationRequest.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/InstallationRequest.java
+@@ -20,7 +20,7 @@ import java.util.Collections;
+ import java.util.LinkedHashSet;
+ import java.util.Set;
+ 
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ 
+ /**
+  * @author Mikolaj Izdebski
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+index f8957e0..0ac0581 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+@@ -36,8 +36,8 @@ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.util.StringUtils;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.InstallerSettings;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/FragmentFile.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/FragmentFile.java
+index ce51b5c..af1b4cf 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/FragmentFile.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/FragmentFile.java
+@@ -29,7 +29,7 @@ import java.util.Set;
+ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.util.xml.pull.MXSerializer;
+ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.config.InstallerSettings;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ 
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
+index 4fcfea0..345796b 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
+@@ -26,8 +26,8 @@ import java.util.Set;
+ import java.util.TreeSet;
+ 
+ import org.codehaus.plexus.logging.Logger;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.InstallerSettings;
+ import org.fedoraproject.maven.config.PackagingRule;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Repository.java b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Repository.java
+index e3668ec..9827fc3 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Repository.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/Repository.java
+@@ -19,7 +19,7 @@ import java.util.List;
+ import java.util.Properties;
+ 
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.config.Stereotype;
+ 
+ /**
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/CompoundRepository.java b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/CompoundRepository.java
+index 2e23607..c00e30b 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/CompoundRepository.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/CompoundRepository.java
+@@ -27,7 +27,7 @@ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.util.StringUtils;
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.config.RepositoryConfigurator;
+ import org.fedoraproject.maven.config.Stereotype;
+ import org.fedoraproject.maven.repository.Repository;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/SimpleRepository.java b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/SimpleRepository.java
+index 84acae2..36e8a86 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/SimpleRepository.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/repository/impl/SimpleRepository.java
+@@ -24,7 +24,7 @@ import java.util.Properties;
+ 
+ import org.codehaus.plexus.util.StringUtils;
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.config.Stereotype;
+ import org.fedoraproject.maven.repository.Repository;
+ import org.fedoraproject.maven.repository.RepositoryPath;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ArtifactBlacklist.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ArtifactBlacklist.java
+index bbeeab9..dabad54 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ArtifactBlacklist.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ArtifactBlacklist.java
+@@ -15,7 +15,7 @@
+  */
+ package org.fedoraproject.maven.resolver;
+ 
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ 
+ /**
+  * A container structure holding artifacts.
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/DependencyMap.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/DependencyMap.java
+index 70aa0e5..610cd17 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/DependencyMap.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/DependencyMap.java
+@@ -18,7 +18,7 @@ package org.fedoraproject.maven.resolver;
+ import java.util.List;
+ import java.util.Set;
+ 
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ 
+ /**
+  * @author Mikolaj Izdebski
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ResolutionRequest.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ResolutionRequest.java
+index 13be4ef..cde56ae 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ResolutionRequest.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/ResolutionRequest.java
+@@ -15,8 +15,8 @@
+  */
+ package org.fedoraproject.maven.resolver;
+ 
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ 
+ /**
+  * Specifies parameters of artifact resolution.
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/Resolver.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/Resolver.java
+index 364093a..010dd1a 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/Resolver.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/Resolver.java
+@@ -17,7 +17,7 @@ package org.fedoraproject.maven.resolver;
+ 
+ import java.io.File;
+ 
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ 
+ /**
+  * Resolves artifacts from system repositories configured in {@code <resolverSettings>} in XMvn configuration.
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultArtifactBlacklist.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultArtifactBlacklist.java
+index cf208ae..ceb65fb 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultArtifactBlacklist.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultArtifactBlacklist.java
+@@ -23,8 +23,8 @@ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.ResolverSettings;
+ import org.fedoraproject.maven.resolver.ArtifactBlacklist;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultDependencyMap.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultDependencyMap.java
+index 78e2268..ac2491f 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultDependencyMap.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultDependencyMap.java
+@@ -31,8 +31,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.ResolverSettings;
+ import org.fedoraproject.maven.resolver.DependencyMap;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java
+index 9fc61c7..35867db 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DefaultResolver.java
+@@ -33,8 +33,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+ import org.codehaus.plexus.util.StringUtils;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.RepositoryConfigurator;
+ import org.fedoraproject.maven.config.ResolverSettings;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DepmapReader.java b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DepmapReader.java
+index 876368c..7173c76 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DepmapReader.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/resolver/impl/DepmapReader.java
+@@ -44,8 +44,8 @@ import javax.xml.parsers.DocumentBuilder;
+ import javax.xml.parsers.DocumentBuilderFactory;
+ import javax.xml.parsers.ParserConfigurationException;
+ 
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.resolver.DependencyMap;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ import org.w3c.dom.Document;
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/utils/ArtifactUtils.java b/xmvn-core/src/main/java/org/fedoraproject/maven/utils/ArtifactUtils.java
+index b6ef806..5a98932 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/utils/ArtifactUtils.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/utils/ArtifactUtils.java
+@@ -25,8 +25,8 @@ import java.util.Map;
+ 
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ 
+ /**
+  * @author Mikolaj Izdebski
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/dependency/AbstractDependencyTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/dependency/AbstractDependencyTest.java
+index e987b01..8556e77 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/dependency/AbstractDependencyTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/dependency/AbstractDependencyTest.java
+@@ -21,8 +21,8 @@ import java.util.HashSet;
+ import java.util.Set;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ 
+ /**
+  * @author Mikolaj Izdebski
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/FlatRepositoryTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/FlatRepositoryTest.java
+index 564a7b7..200c62e 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/FlatRepositoryTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/FlatRepositoryTest.java
+@@ -18,8 +18,8 @@ package org.fedoraproject.maven.repository;
+ import java.nio.file.Paths;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.Repository;
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/JppRepositoryTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/JppRepositoryTest.java
+index 9f9224e..aa12d45 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/JppRepositoryTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/JppRepositoryTest.java
+@@ -18,8 +18,8 @@ package org.fedoraproject.maven.repository;
+ import java.nio.file.Paths;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.Repository;
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java
+index a346e4e..ad9f44c 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/LayoutTest.java
+@@ -20,8 +20,8 @@ import java.util.Set;
+ import java.util.TreeSet;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ 
+ /**
+  * @author Mikolaj Izdebski
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MavenRepositoryTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MavenRepositoryTest.java
+index b1ad50c..10efb2e 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MavenRepositoryTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MavenRepositoryTest.java
+@@ -18,8 +18,8 @@ package org.fedoraproject.maven.repository;
+ import java.nio.file.Paths;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.Repository;
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MyRepository.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MyRepository.java
+index 97e37c6..95f3c86 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MyRepository.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/MyRepository.java
+@@ -25,7 +25,7 @@ import java.util.Properties;
+ 
+ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.config.Stereotype;
+ 
+ @Component( role = Repository.class, hint = "my-type" )
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/NestedRepositoriesTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/NestedRepositoriesTest.java
+index 2d096f2..34f437a 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/repository/NestedRepositoriesTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/repository/NestedRepositoriesTest.java
+@@ -21,8 +21,8 @@ import java.util.Iterator;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.Repository;
+diff --git a/xmvn-core/src/test/java/org/fedoraproject/maven/resolver/DepmapTest.java b/xmvn-core/src/test/java/org/fedoraproject/maven/resolver/DepmapTest.java
+index 04ea28b..19f435f 100644
+--- a/xmvn-core/src/test/java/org/fedoraproject/maven/resolver/DepmapTest.java
++++ b/xmvn-core/src/test/java/org/fedoraproject/maven/resolver/DepmapTest.java
+@@ -23,8 +23,8 @@ import java.nio.file.Paths;
+ import java.util.List;
+ 
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.ResolverSettings;
+ 
+diff --git a/xmvn-mojo/pom.xml b/xmvn-mojo/pom.xml
+index 48c125f..ead22db 100644
+--- a/xmvn-mojo/pom.xml
++++ b/xmvn-mojo/pom.xml
+@@ -68,13 +68,17 @@
+       <artifactId>plexus-component-annotations</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.aether</groupId>
++      <groupId>org.sonatype.aether</groupId>
+       <artifactId>aether-api</artifactId>
+     </dependency>
++    <dependency>
++      <groupId>org.sonatype.aether</groupId>
++      <artifactId>aether-util</artifactId>
++    </dependency>
+   </dependencies>
+   <build>
+     <plugins>
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java
+index a8e94c5..5e5ddd3 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java
+@@ -34,7 +34,7 @@ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.util.xml.pull.MXSerializer;
+ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+-import org.eclipse.aether.artifact.Artifact;
++import org.sonatype.aether.artifact.Artifact;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.dependency.DependencyExtractionRequest;
+ import org.fedoraproject.maven.dependency.DependencyExtractionResult;
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+index ae95028..3cedf7c 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+@@ -45,8 +45,8 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+ import org.codehaus.plexus.util.xml.pull.MXSerializer;
+ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ 
+ /**
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java
+index 0a9995f..8b0c7a1 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java
+@@ -27,8 +27,8 @@ import org.apache.maven.model.Dependency;
+ import org.apache.maven.model.Model;
+ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+ import org.codehaus.plexus.util.StringUtils;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ 
+ /**
+diff --git a/xmvn-parent/pom.xml b/xmvn-parent/pom.xml
+index f964958..53db82a 100644
+--- a/xmvn-parent/pom.xml
++++ b/xmvn-parent/pom.xml
+@@ -74,14 +74,14 @@
+   <properties>
+     <project.build.sourceEncoding>US-ASCII</project.build.sourceEncoding>
+ 
+-    <aetherVersion>0.9.0.M3</aetherVersion>
++    <aetherVersion>1.13.1</aetherVersion>
+     <jcommanderVersion>1.30</jcommanderVersion>
+     <mavenInvokerVersion>2.1.1</mavenInvokerVersion>
+-    <mavenVersion>3.1.0</mavenVersion>
++    <mavenVersion>3.0.5</mavenVersion>
+     <plexusUtilsVersion>3.0.15</plexusUtilsVersion>
+     <plexusVersion>1.5.5</plexusVersion>
+     <pluginToolsVersion>3.2</pluginToolsVersion>
+-    <sisuVersion>0.0.0.M5</sisuVersion>
++    <sisuVersion>2.3.0</sisuVersion>
+ 
+     <!-- Build dependencies -->
+     <apivizVersion>1.3.2.GA</apivizVersion>
+@@ -134,11 +134,16 @@
+         <version>${mavenVersion}</version>
+       </dependency>
+       <dependency>
+-        <groupId>org.eclipse.aether</groupId>
++        <groupId>org.sonatype.aether</groupId>
+         <artifactId>aether-api</artifactId>
+         <version>${aetherVersion}</version>
+       </dependency>
+       <dependency>
++        <groupId>org.sonatype.aether</groupId>
++        <artifactId>aether-util</artifactId>
++        <version>${aetherVersion}</version>
++      </dependency>
++      <dependency>
+         <groupId>org.apache.maven.plugin-tools</groupId>
+         <artifactId>maven-plugin-annotations</artifactId>
+         <version>${pluginToolsVersion}</version>
+@@ -149,8 +154,8 @@
+         <version>${plexusVersion}</version>
+       </dependency>
+       <dependency>
+-        <groupId>org.eclipse.sisu</groupId>
+-        <artifactId>org.eclipse.sisu.plexus</artifactId>
++        <groupId>org.sonatype.sisu</groupId>
++        <artifactId>sisu-inject-plexus</artifactId>
+         <version>${sisuVersion}</version>
+       </dependency>
+       <dependency>
+diff --git a/xmvn-tools/pom.xml b/xmvn-tools/pom.xml
+index 5afff08..9ab6656 100644
+--- a/xmvn-tools/pom.xml
++++ b/xmvn-tools/pom.xml
+@@ -48,8 +48,8 @@
+       <artifactId>xmvn-core</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+   </dependencies>
+   <build>
+diff --git a/xmvn-tools/xmvn-install/pom.xml b/xmvn-tools/xmvn-install/pom.xml
+index 2c45de0..d9a554a 100644
+--- a/xmvn-tools/xmvn-install/pom.xml
++++ b/xmvn-tools/xmvn-install/pom.xml
+@@ -27,10 +27,14 @@
+   <artifactId>xmvn-install</artifactId>
+   <dependencies>
+     <dependency>
+-      <groupId>org.eclipse.aether</groupId>
++      <groupId>org.sonatype.aether</groupId>
+       <artifactId>aether-api</artifactId>
+     </dependency>
+     <dependency>
++      <groupId>org.sonatype.aether</groupId>
++      <artifactId>aether-util</artifactId>
++    </dependency>
++    <dependency>
+       <groupId>org.codehaus.plexus</groupId>
+       <artifactId>plexus-utils</artifactId>
+     </dependency>
+diff --git a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/maven/tools/installer/InstallerCli.java b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/maven/tools/installer/InstallerCli.java
+index 1fef93d..5ad8789 100644
+--- a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/maven/tools/installer/InstallerCli.java
++++ b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/maven/tools/installer/InstallerCli.java
+@@ -32,8 +32,8 @@ import org.codehaus.plexus.DefaultPlexusContainer;
+ import org.codehaus.plexus.util.xml.Xpp3Dom;
+ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.installer.InstallationRequest;
+ import org.fedoraproject.maven.installer.Installer;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+diff --git a/xmvn-tools/xmvn-resolve/pom.xml b/xmvn-tools/xmvn-resolve/pom.xml
+index 549633e..3bec4ca 100644
+--- a/xmvn-tools/xmvn-resolve/pom.xml
++++ b/xmvn-tools/xmvn-resolve/pom.xml
+@@ -36,8 +36,12 @@
+   </description>
+   <dependencies>
+     <dependency>
+-      <groupId>org.eclipse.aether</groupId>
++      <groupId>org.sonatype.aether</groupId>
+       <artifactId>aether-api</artifactId>
+     </dependency>
++    <dependency>
++      <groupId>org.sonatype.aether</groupId>
++      <artifactId>aether-util</artifactId>
++    </dependency>
+   </dependencies>
+ </project>
+diff --git a/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/maven/tools/resolver/ResolverCli.java b/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/maven/tools/resolver/ResolverCli.java
+index a3df870..a18839d 100644
+--- a/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/maven/tools/resolver/ResolverCli.java
++++ b/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/maven/tools/resolver/ResolverCli.java
+@@ -25,8 +25,8 @@ import java.util.TreeMap;
+ 
+ import org.codehaus.plexus.DefaultPlexusContainer;
+ import org.codehaus.plexus.logging.Logger;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.resolver.ResolutionRequest;
+ import org.fedoraproject.maven.resolver.Resolver;
+ import org.fedoraproject.maven.utils.LoggingUtils;
+diff --git a/xmvn-tools/xmvn-subst/pom.xml b/xmvn-tools/xmvn-subst/pom.xml
+index 2b68d32..7233cca 100644
+--- a/xmvn-tools/xmvn-subst/pom.xml
++++ b/xmvn-tools/xmvn-subst/pom.xml
+@@ -33,10 +33,14 @@
+   </description>
+   <dependencies>
+     <dependency>
+-      <groupId>org.eclipse.aether</groupId>
++      <groupId>org.sonatype.aether</groupId>
+       <artifactId>aether-api</artifactId>
+     </dependency>
+     <dependency>
++      <groupId>org.sonatype.aether</groupId>
++      <artifactId>aether-util</artifactId>
++    </dependency>
++    <dependency>
+       <groupId>org.codehaus.plexus</groupId>
+       <artifactId>plexus-component-annotations</artifactId>
+     </dependency>
+diff --git a/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/maven/tools/subst/ArtifactVisitor.java b/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/maven/tools/subst/ArtifactVisitor.java
+index ab2f2a1..af12a43 100644
+--- a/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/maven/tools/subst/ArtifactVisitor.java
++++ b/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/maven/tools/subst/ArtifactVisitor.java
+@@ -33,8 +33,8 @@ import java.util.zip.ZipInputStream;
+ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.logging.Logger;
+-import org.eclipse.aether.artifact.Artifact;
+-import org.eclipse.aether.artifact.DefaultArtifact;
++import org.sonatype.aether.artifact.Artifact;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
+ import org.fedoraproject.maven.resolver.ResolutionRequest;
+ import org.fedoraproject.maven.resolver.Resolver;
+ import org.fedoraproject.maven.utils.FileUtils;
+-- 
+1.8.1.4
+
