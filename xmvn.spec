@@ -1,13 +1,11 @@
 Name:           xmvn
-Version:        1.1.0
-Release:        2%{?dist}
+Version:        1.2.0
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
-
-Patch1:         0001-Take-stereotypes-into-account-during-dependency-extr.patch
 
 BuildRequires:  maven >= 3.1.0
 BuildRequires:  maven-local
@@ -17,6 +15,7 @@ BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
+BuildRequires:  xmlunit
 
 Requires:       maven >= 3.1.0
 
@@ -34,7 +33,6 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-%patch1 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -51,7 +49,7 @@ ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 rm -rf src/it
 
 %build
-%mvn_build -X
+%mvn_build
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{name}-%{version}*
@@ -144,6 +142,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Oct 18 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.2.0-1
+- Update to upstream version 1.2.0
+
 * Mon Oct 07 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.1.0-2
 - Apply patch for rhbz#1015596
 
