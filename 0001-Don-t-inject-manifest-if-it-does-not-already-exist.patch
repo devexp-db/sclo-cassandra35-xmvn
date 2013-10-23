@@ -1,0 +1,28 @@
+From 30a4d3786f2b9ac9b0669db51fbf138a3ee3a674 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 22 Oct 2013 15:56:45 +0200
+Subject: [PATCH] Don't inject manifest if it does not already exist
+
+---
+ .../org/fedoraproject/maven/installer/impl/DefaultInstaller.java     | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+index f1cf72d..51c2d4e 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+@@ -144,10 +144,7 @@ public class DefaultInstaller
+         {
+             Manifest mf = jis.getManifest();
+             if ( mf == null )
+-            {
+-                mf = new Manifest();
+-                mf.getMainAttributes().putValue( "Manifest-Version", "1.0" );
+-            }
++                return artifact;
+ 
+             putAttribute( mf, ArtifactUtils.MF_KEY_GROUPID, artifact.getGroupId(), null );
+             putAttribute( mf, ArtifactUtils.MF_KEY_ARTIFACTID, artifact.getArtifactId(), null );
+-- 
+1.8.1.4
+
