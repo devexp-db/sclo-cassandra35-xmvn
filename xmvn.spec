@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -147,6 +147,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Oct 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.2.0-4
+- Rebuild to regenerate broken POMs
+- Related: rhbz#1021484
+
 * Wed Oct 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.2.0-3
 - Temporarly skip running tests
 
