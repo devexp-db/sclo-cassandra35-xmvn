@@ -20,7 +20,7 @@ BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
 BuildRequires:  xmlunit
 
-Requires:       maven >= 3.1.0
+Requires:       maven >= 3.1.1-5
 
 %description
 This package provides extensions for Apache Maven that can be used to
