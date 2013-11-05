@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.2.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -10,7 +10,7 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 # Backported from upstream commit 30a4d37
 Patch0001:      0001-Don-t-inject-manifest-if-it-does-not-already-exist.patch
 
-BuildRequires:  maven >= 3.1.0
+BuildRequires:  maven >= 3.1.1-5
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -147,6 +147,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Nov  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.2.0-5
+- Require Maven >= 3.1.1-5
+- Resolves: rhbz#1014355
+
 * Wed Oct 23 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.2.0-4
 - Rebuild to regenerate broken POMs
 - Related: rhbz#1021484
