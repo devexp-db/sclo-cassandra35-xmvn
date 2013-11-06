@@ -1,14 +1,11 @@
 Name:           xmvn
-Version:        1.2.0
-Release:        5%{?dist}
+Version:        1.3.0
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
-
-# Backported from upstream commit 30a4d37
-Patch0001:      0001-Don-t-inject-manifest-if-it-does-not-already-exist.patch
 
 BuildRequires:  maven >= 3.1.1-5
 BuildRequires:  maven-local
@@ -36,7 +33,6 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-%patch0001 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -147,6 +143,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Nov 06 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.3.0-1
+- Update to upstream release 1.3.0
+
 * Tue Nov  5 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.2.0-5
 - Require Maven >= 3.1.1-5
 - Resolves: rhbz#1014355
