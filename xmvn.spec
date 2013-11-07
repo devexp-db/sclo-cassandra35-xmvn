@@ -1,5 +1,5 @@
 Name:           xmvn
-Version:        1.1.0
+Version:        1.3.0
 Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
@@ -17,6 +17,8 @@ BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
+BuildRequires:  objectweb-asm
+BuildRequires:  xmlunit
 
 Requires:       maven >= 3.0.5
 
@@ -35,11 +37,6 @@ This package provides %{summary}.
 %prep
 %setup -q
 %patch1 -p1
-
-# Add cglib test dependency as a workaround for rhbz#911365
-# Can be removed after guice rebuild with no_aop
-%pom_add_dep cglib:cglib %{name}-core
-%pom_add_dep aopalliance:aopalliance %{name}-core
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -148,6 +145,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Nov  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-1
+- Rebase upstream version 1.3.0
+
 * Tue Oct 01 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.1.0-1
 - Update to upstream version 1.1.0
 
