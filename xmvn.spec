@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -92,22 +92,19 @@ cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{name}-subst %{buildroot}%{_datadir}/%{name}/
-for jar in core connector;do
-    ln -sf %{_javadir}/%{name}/%{name}-$jar.jar %{buildroot}%{_datadir}/%{name}/lib
-done
 
+# XXX temp until guice is rebuilt and no_aop has proper manifest so that xmvn-subst will work on it
 for tool in subst resolver bisect installer;do
-    # sisu doesn't contain pom.properties. Manually replace with symlinks
+    # guice-no_aop doesn't contain correct pom.properties. Manually replace with symlinks
     pushd %{buildroot}%{_datadir}/%{name}/lib/$tool
-        build-jar-repository . guice/google-guice
+       rm -f %{buildroot}%{_datadir}/%{name}/lib/google-guice*
+       rm -f %{buildroot}%{_datadir}/%{name}/lib/sisu-guice*
+       build-jar-repository . guice/google-guice-no_aop
     popd
 done
-
-# workaround for rhbz#1012982
-# only when guice has no_aop version compiled
-#rm %{buildroot}%{_datadir}/%{name}/lib/google-guice-no_aop.jar
-#build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ \
-#                     guice/google-guice-no_aop
+rm -f %{buildroot}%{_datadir}/%{name}/lib/google-guice*
+rm -f %{buildroot}%{_datadir}/%{name}/lib/sisu-guice*
+build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ guice/google-guice-no_aop
 
 # reenable after build
 #if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
@@ -145,6 +142,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Nov  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-3
+- Fix guice symlinks
+
 * Thu Nov  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-2
 - Bump Maven requirement to 3.0.5-14
 
