@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -9,7 +9,7 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 
 Patch1:         0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
 
-BuildRequires:  maven >= 3.0.5
+BuildRequires:  maven >= 3.0.5-14
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -20,7 +20,7 @@ BuildRequires:  maven-invoker-plugin
 BuildRequires:  objectweb-asm
 BuildRequires:  xmlunit
 
-Requires:       maven >= 3.0.5
+Requires:       maven >= 3.0.5-14
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -145,6 +145,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Nov  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-2
+- Bump Maven requirement to 3.0.5-14
+
 * Thu Nov  7 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-1
 - Rebase upstream version 1.3.0
 
