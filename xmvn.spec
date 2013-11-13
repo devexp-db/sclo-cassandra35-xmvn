@@ -7,7 +7,7 @@ URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
-BuildRequires:  maven >= 3.1.1-5
+BuildRequires:  maven >= 3.1.1-13
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -17,7 +17,7 @@ BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
 BuildRequires:  xmlunit
 
-Requires:       maven >= 3.1.1-5
+Requires:       maven >= 3.1.1-13
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -143,8 +143,8 @@ end
 %doc LICENSE NOTICE
 
 %changelog
-* Wed Nov 13 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.3.0-2
-- Rebuild to fix symlinking
+* Fri Nov  8 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-2
+- Add wagon-http-shared4 to plexus.core
 
 * Wed Nov 06 2013 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.3.0-1
 - Update to upstream release 1.3.0
