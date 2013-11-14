@@ -1,11 +1,12 @@
 Name:           xmvn
 Version:        1.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+Patch0:         update-to-sisu-0.1.0.patch
 
 BuildRequires:  maven >= 3.1.1-13
 BuildRequires:  maven-local
@@ -34,6 +35,8 @@ This package provides %{summary}.
 %prep
 %setup -q
 
+%patch0 -p1
+
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
 %pom_xpath_remove "pom:executions/pom:execution[pom:id[text()='maven-binaries']]"
@@ -43,10 +46,6 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
 ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
-
-# sisu.plexus needs this, but doesn't bring it
-# see: http://dev.eclipse.org/mhonarc/lists/sisu-users/msg00038.html
-%pom_add_dep org.sonatype.sisu:sisu-guice::no_aop: xmvn-tools
 
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
@@ -146,6 +145,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Nov 14 2013 Michael Simacek <msimacek@redhat.com> - 1.3.0-4
+- Update to Sisu 0.1.0
+
 * Thu Nov 14 2013 Michal Srb <msrb@redhat.com> - 1.3.0-3
 - Add dep org.sonatype.sisu:sisu-guice::no_aop:
 
