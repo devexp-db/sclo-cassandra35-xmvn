@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -44,6 +44,9 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
+# sisu.plexus needs this, but doesn't bring it
+# see: http://dev.eclipse.org/mhonarc/lists/sisu-users/msg00038.html
+%pom_add_dep org.sonatype.sisu:sisu-guice::no_aop: xmvn-tools
 
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
@@ -143,6 +146,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Nov 14 2013 Michal Srb <msrb@redhat.com> - 1.3.0-3
+- Add dep org.sonatype.sisu:sisu-guice::no_aop:
+
 * Fri Nov  8 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-2
 - Add wagon-http-shared4 to plexus.core
 
