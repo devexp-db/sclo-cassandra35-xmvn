@@ -1,12 +1,11 @@
 Name:           xmvn
-Version:        1.3.0
-Release:        4%{?dist}
+Version:        1.4.0
+Release:        1%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
-Patch0:         update-to-sisu-0.1.0.patch
 
 BuildRequires:  maven >= 3.1.1-13
 BuildRequires:  maven-local
@@ -34,8 +33,6 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-
-%patch0 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -145,6 +142,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Dec  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.4.0-1
+- Update to upstream version 1.4.0
+
 * Thu Nov 14 2013 Michael Simacek <msimacek@redhat.com> - 1.3.0-4
 - Update to Sisu 0.1.0
 
