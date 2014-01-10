@@ -10,6 +10,7 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 Patch0001:      0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
 Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
 Patch0003:      0003-Port-to-Sonatype-Sisu.patch
+Patch0004:      0004-Add-support-for-absolute-artifact-symlinks.patch
 
 BuildRequires:  maven >= 3.0.5-14
 BuildRequires:  maven-local
@@ -41,6 +42,7 @@ This package provides %{summary}.
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
+%patch0004 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -148,6 +150,7 @@ end
 %changelog
 * Fri Jan 10 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5
 - Split 1 patch to 3 patches, one per feature
+- Add support for absolute artifact symlinks
 
 * Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.3.0-4
 - Mass rebuild 2013-12-27
