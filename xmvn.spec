@@ -1,13 +1,15 @@
 Name:           xmvn
 Version:        1.3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
-Patch1:         0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
+Patch0001:      0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
+Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
+Patch0003:      0003-Port-to-Sonatype-Sisu.patch
 
 BuildRequires:  maven >= 3.0.5-14
 BuildRequires:  maven-local
@@ -36,7 +38,9 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-%patch1 -p1
+%patch0001 -p1
+%patch0002 -p1
+%patch0003 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -142,6 +146,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Jan 10 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5
+- Split 1 patch to 3 patches, one per feature
+
 * Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.3.0-4
 - Mass rebuild 2013-12-27
 
