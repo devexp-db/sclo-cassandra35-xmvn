@@ -1,11 +1,15 @@
 Name:           xmvn
-Version:        1.4.0
-Release:        1%{?dist}
+Version:        1.5.0
+Release:        0.19.gitcb3a0a6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
-Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+#Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+
+# git clone git://git.fedorahosted.org/git/%{name}.git
+# (cd ./%{name} && git archive --format tar --prefix %{name}-%{version}/ cb3a0a6 | xz) >%{name}-%{version}-SNAPSHOT.tar.xz
+Source0:        %{name}-%{version}-SNAPSHOT.tar.xz
 
 BuildRequires:  maven >= 3.1.1-13
 BuildRequires:  maven-local
@@ -142,6 +146,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jan 14 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-0.19.gitcb3a0a6
+- Update to pre-release of upstream version 1.5.0
+
 * Mon Dec  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.4.0-1
 - Update to upstream version 1.4.0
 
