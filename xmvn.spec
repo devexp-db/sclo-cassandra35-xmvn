@@ -9,7 +9,7 @@ Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
-Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://fedorahosted.org/released/%{pkg_name}/%{pkg_name}-%{version}.tar.xz
 
 Patch0001:      0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
 Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
@@ -36,7 +36,7 @@ artifacts in offline mode, as well as Maven plugins to help with
 creating RPM packages containing Maven artifacts.
 
 %package        javadoc
-Summary:        API documentation for %{name}
+Summary:        API documentation for %{pkg_name}
 
 %description    javadoc
 This package provides %{summary}.
@@ -66,77 +66,77 @@ rm -rf src/it
 %mvn_build -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
-chmod -R +rwX %{name}-%{version}*
+chmod -R +rwX %{pkg_name}-%{version}*
 
 
 %install
 %mvn_install
 
-install -d -m 755 %{buildroot}%{_datadir}/%{name}
-cp -r %{name}-%{version}*/* %{buildroot}%{_datadir}/%{name}/
-ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{name}/bin/mvn
-ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{name}/bin/mvnDebug
-ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{name}/bin/mvnyjp
+install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
+cp -r %{pkg_name}-%{version}*/* %{buildroot}%{_datadir}/%{pkg_name}/
+ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
+ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
+ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
 
 
 # helper scripts
 install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 xmvn-tools/src/main/bin/tool-script \
-               %{buildroot}%{_datadir}/%{name}/bin/
+               %{buildroot}%{_datadir}/%{pkg_name}/bin/
 
 for tool in subst resolve bisect install;do
-    rm %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
+    rm %{buildroot}%{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool
     ln -s tool-script \
-          %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
+          %{buildroot}%{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool
 
-    cat <<EOF >%{buildroot}%{_bindir}/%{name}-$tool
+    cat <<EOF >%{buildroot}%{_bindir}/%{pkg_name}-$tool
 #!/bin/sh -e
-exec %{_datadir}/%{name}/bin/%{name}-$tool "\${@}"
+exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool "\${@}"
 EOF
-    chmod +x %{buildroot}%{_bindir}/%{name}-$tool
+    chmod +x %{buildroot}%{_bindir}/%{pkg_name}-$tool
 
 done
 
 # copy over maven lib directory
-cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
+cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
-%{name}-subst %{buildroot}%{_datadir}/%{name}/
+%{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
 
 # XXX temp until guice is rebuilt and no_aop has proper manifest so that xmvn-subst will work on it
 for tool in subst resolver bisect installer;do
     # guice-no_aop doesn't contain correct pom.properties. Manually replace with symlinks
-    pushd %{buildroot}%{_datadir}/%{name}/lib/$tool
-       rm -f %{buildroot}%{_datadir}/%{name}/lib/google-guice*
-       rm -f %{buildroot}%{_datadir}/%{name}/lib/sisu-guice*
+    pushd %{buildroot}%{_datadir}/%{pkg_name}/lib/$tool
+       rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/google-guice*
+       rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/sisu-guice*
        build-jar-repository . guice/google-guice-no_aop
     popd
 done
-rm -f %{buildroot}%{_datadir}/%{name}/lib/google-guice*
-rm -f %{buildroot}%{_datadir}/%{name}/lib/sisu-guice*
-build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ guice/google-guice-no_aop
+rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/google-guice*
+rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/sisu-guice*
+build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice-no_aop
 
 # reenable after build
-#if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
+#if [[ `find %{buildroot}%{_datadir}/%{pkg_name}/lib -type f -name '*.jar' -not -name '*%{pkg_name}*' | wc -l` -ne 0 ]];then
 #    echo "Some jar files were not symlinked during build. Aborting"
 #    exit 1
 #fi
 
 
 # /usr/bin/xmvn script
-cat <<EOF >%{buildroot}%{_bindir}/%{name}
+cat <<EOF >%{buildroot}%{_bindir}/%{pkg_name}
 #!/bin/sh -e
-export M2_HOME="\${M2_HOME:-%{_datadir}/%{name}}"
+export M2_HOME="\${M2_HOME:-%{_datadir}/%{pkg_name}}"
 exec mvn "\${@}"
 EOF
 
 # make sure our conf is identical to maven so yum won't freak out
-cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
+cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
 for key, dir in pairs({"conf", "conf/logging", "boot"}) do
-    path = "%{_datadir}/%{name}/" .. dir
+    path = "%{_datadir}/%{pkg_name}/" .. dir
     if posix.readlink(path) then
        os.remove(path)
     end
@@ -146,7 +146,7 @@ end
 %doc LICENSE NOTICE
 %doc AUTHORS README
 %attr(755,-,-) %{_bindir}/*
-%{_datadir}/%{name}
+%{_datadir}/%{pkg_name}
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
