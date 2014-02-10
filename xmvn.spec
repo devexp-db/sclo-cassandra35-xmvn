@@ -2,7 +2,7 @@
 %{?scl:%scl_package %{pkg_name}}
 %{?maven_find_provides_and_requires}
 
-Name:           xmvn
+Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
 Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
