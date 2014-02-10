@@ -63,10 +63,12 @@ ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 rm -rf src/it
 
 %build
+%{?scl:scl enable %{scl} - <<EOF}
 %mvn_build -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{pkg_name}-%{version}*
+%{?scl:EOF}
 
 
 %install
