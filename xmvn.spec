@@ -17,7 +17,7 @@ Patch0003:      0003-Port-to-Sonatype-Sisu.patch
 Patch0004:      0004-Add-support-for-absolute-artifact-symlinks.patch
 
 BuildRequires:  maven >= 3.0.5-14
-BuildRequires:  maven-local
+BuildRequires:  %{?scl_prefix}maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
 BuildRequires:  maven-dependency-plugin
