@@ -42,7 +42,7 @@ Summary:        API documentation for %{name}
 This package provides %{summary}.
 
 %prep
-%setup -q
+%setup -q -n %{pkg_name}-%{version}
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
