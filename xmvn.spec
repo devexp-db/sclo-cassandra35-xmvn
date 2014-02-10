@@ -1,3 +1,7 @@
+%global pkg_name xmvn
+%{?scl:%scl_package %{pkg_name}}
+%{?maven_find_provides_and_requires}
+
 Name:           xmvn
 Version:        1.3.0
 Release:        5%{?dist}
