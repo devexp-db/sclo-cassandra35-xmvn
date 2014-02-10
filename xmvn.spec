@@ -43,6 +43,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n %{pkg_name}-%{version}
+%{?scl:scl enable %{scl} - <<EOF}
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
@@ -61,6 +62,7 @@ ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
+%{?scl:EOF}
 
 %build
 %{?scl:scl enable %{scl} - <<EOF}
