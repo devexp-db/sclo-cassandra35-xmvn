@@ -43,7 +43,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n %{pkg_name}-%{version}
-%{?scl:scl enable %{scl} - <<EOF}
+%{?scl:scl enable %{scl} - <<"EOF"}
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
@@ -65,7 +65,7 @@ rm -rf src/it
 %{?scl:EOF}
 
 %build
-%{?scl:scl enable %{scl} - <<EOF}
+%{?scl:scl enable %{scl} - <<"EOF"}
 %mvn_build -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
@@ -74,7 +74,7 @@ chmod -R +rwX %{pkg_name}-%{version}*
 
 
 %install
-%{?scl:scl enable %{scl} - <<EOF}
+%{?scl:scl enable %{scl} - <<"EOF"}
 %mvn_install
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
@@ -94,7 +94,7 @@ for tool in subst resolve bisect install;do
     ln -s tool-script \
           %{buildroot}%{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool
 
-    cat <<EOF >%{buildroot}%{_bindir}/%{pkg_name}-$tool
+    cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}-$tool
 #!/bin/sh -e
 exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool "\${@}"
 EOF
@@ -129,7 +129,7 @@ build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice
 
 
 # /usr/bin/xmvn script
-cat <<EOF >%{buildroot}%{_bindir}/%{pkg_name}
+cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}
 #!/bin/sh -e
 export M2_HOME="\${M2_HOME:-%{_datadir}/%{pkg_name}}"
 exec mvn "\${@}"
