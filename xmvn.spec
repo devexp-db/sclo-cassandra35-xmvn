@@ -74,7 +74,7 @@ chmod -R +rwX %{pkg_name}-%{version}*
 
 
 %install
-%{?scl:scl enable %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"SCL_EOF"}
 %mvn_install
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
@@ -137,7 +137,7 @@ EOF
 
 # make sure our conf is identical to maven so yum won't freak out
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
-%{?scl:EOF}
+%{?scl:SCL_EOF}
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
