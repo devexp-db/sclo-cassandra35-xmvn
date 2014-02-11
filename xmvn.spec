@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -158,6 +158,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Feb 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-6
+- Enable software collections build
+
 * Fri Jan 10 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5
 - Split 1 patch to 3 patches, one per feature
 - Add support for absolute artifact symlinks
