@@ -74,7 +74,7 @@ chmod -R +rwX %{pkg_name}-%{version}*
 
 
 %install
-%{?scl:scl enable %{scl} - <<"SCL_EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 %mvn_install
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
@@ -94,10 +94,8 @@ for tool in subst resolve bisect install;do
     ln -s tool-script \
           %{buildroot}%{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool
 
-    cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}-$tool
-#!/bin/sh -e
-exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool "${@}"
-EOF
+    echo "#!/bin/sh -e
+exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}-$tool
     chmod +x %{buildroot}%{_bindir}/%{pkg_name}-$tool
 
 done
@@ -143,15 +141,13 @@ ln -sf %{_root_datadir}/maven/lib/maven-settings.jar
 popd
 
 # /usr/bin/xmvn script
-cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}
-#!/bin/sh -e
-export M2_HOME="${M2_HOME:-%{_datadir}/%{pkg_name}}"
-exec mvn "${@}"
-EOF
+echo "#!/bin/sh -e
+export M2_HOME=\"\${M2_HOME:-%{_datadir}/%{pkg_name}}\"
+exec mvn \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}
 
 # make sure our conf is identical to maven so yum won't freak out
 cp -P %{_root_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
-%{?scl:SCL_EOF}
+%{?scl:EOF}
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
@@ -177,6 +173,7 @@ end
 - Fix quotation in nested here-documents
 - Fix symlinks to Maven
 - Fix dangling symlinks to Maven JARs
+- Avoid nested here-documents
 
 * Tue Feb 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.1
 - First maven30 software collection build
