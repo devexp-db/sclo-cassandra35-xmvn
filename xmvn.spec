@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.1%{?dist}
+Release:        5.2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -57,7 +57,7 @@ This package provides %{summary}.
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
-ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
+ln -s %{_root_datadir}/maven target/dependency/apache-maven-$mver
 
 
 # skip ITs for now (mix of old & new XMvn config causes issues
@@ -103,7 +103,7 @@ EOF
 done
 
 # copy over maven lib directory
-cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
+cp -r %{_root_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
@@ -136,7 +136,7 @@ exec mvn "\${@}"
 EOF
 
 # make sure our conf is identical to maven so yum won't freak out
-cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
+cp -P %{_root_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
 %{?scl:SCL_EOF}
 
 %pretrans -p <lua>
@@ -158,6 +158,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Feb 12 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.2
+- Use Maven from %%{_root_datadir} for now
+
 * Tue Feb 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.1
 - First maven30 software collection build
 
