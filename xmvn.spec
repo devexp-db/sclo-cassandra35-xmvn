@@ -79,9 +79,9 @@ chmod -R +rwX %{pkg_name}-%{version}*
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
 cp -r %{pkg_name}-%{version}*/* %{buildroot}%{_datadir}/%{pkg_name}/
-ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
-ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
-ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
+ln -sf %{_root_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
+ln -sf %{_root_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
+ln -sf %{_root_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
 
 
 # helper scripts
@@ -161,6 +161,7 @@ end
 * Wed Feb 12 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.2
 - Use Maven from %%{_root_datadir} for now
 - Fix quotation in nested here-documents
+- Fix symlinks to Maven
 
 * Tue Feb 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.1
 - First maven30 software collection build
