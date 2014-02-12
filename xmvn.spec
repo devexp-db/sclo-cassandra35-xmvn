@@ -127,6 +127,20 @@ build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice
 #    exit 1
 #fi
 
+# Symlink some of Maven JARs
+pushd %{buildroot}%{_datadir}/%{pkg_name}/lib/
+ln -sf %{_root_datadir}/maven/lib/maven-aether-provider.jar
+ln -sf %{_root_datadir}/maven/lib/maven-artifact.jar
+ln -sf %{_root_datadir}/maven/lib/maven-compat.jar
+ln -sf %{_root_datadir}/maven/lib/maven-core.jar
+ln -sf %{_root_datadir}/maven/lib/maven-embedder.jar
+ln -sf %{_root_datadir}/maven/lib/maven-model-builder.jar
+ln -sf %{_root_datadir}/maven/lib/maven-model.jar
+ln -sf %{_root_datadir}/maven/lib/maven-plugin-api.jar
+ln -sf %{_root_datadir}/maven/lib/maven-repository-metadata.jar
+ln -sf %{_root_datadir}/maven/lib/maven-settings-builder.jar
+ln -sf %{_root_datadir}/maven/lib/maven-settings.jar
+popd
 
 # /usr/bin/xmvn script
 cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}
@@ -162,6 +176,7 @@ end
 - Use Maven from %%{_root_datadir} for now
 - Fix quotation in nested here-documents
 - Fix symlinks to Maven
+- Fix dangling symlinks to Maven JARs
 
 * Tue Feb 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.1
 - First maven30 software collection build
