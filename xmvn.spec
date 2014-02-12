@@ -96,7 +96,7 @@ for tool in subst resolve bisect install;do
 
     cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}-$tool
 #!/bin/sh -e
-exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool "\${@}"
+exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool "${@}"
 EOF
     chmod +x %{buildroot}%{_bindir}/%{pkg_name}-$tool
 
@@ -131,8 +131,8 @@ build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice
 # /usr/bin/xmvn script
 cat <<"EOF" >%{buildroot}%{_bindir}/%{pkg_name}
 #!/bin/sh -e
-export M2_HOME="\${M2_HOME:-%{_datadir}/%{pkg_name}}"
-exec mvn "\${@}"
+export M2_HOME="${M2_HOME:-%{_datadir}/%{pkg_name}}"
+exec mvn "${@}"
 EOF
 
 # make sure our conf is identical to maven so yum won't freak out
@@ -160,6 +160,7 @@ end
 %changelog
 * Wed Feb 12 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.2
 - Use Maven from %%{_root_datadir} for now
+- Fix quotation in nested here-documents
 
 * Tue Feb 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.1
 - First maven30 software collection build
