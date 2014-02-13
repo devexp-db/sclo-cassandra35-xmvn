@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.3%{?dist}
+Release:        5.4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -16,18 +16,18 @@ Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
 Patch0003:      0003-Port-to-Sonatype-Sisu.patch
 Patch0004:      0004-Add-support-for-absolute-artifact-symlinks.patch
 
-BuildRequires:  maven >= 3.0.5-14
+BuildRequires:  %{?scl_prefix}maven >= 3.0.5-14
 BuildRequires:  %{?scl_prefix}maven-local
-BuildRequires:  beust-jcommander
-BuildRequires:  cglib
-BuildRequires:  maven-dependency-plugin
-BuildRequires:  maven-plugin-build-helper
-BuildRequires:  maven-assembly-plugin
-BuildRequires:  maven-invoker-plugin
-BuildRequires:  objectweb-asm
-BuildRequires:  xmlunit
+BuildRequires:  %{?scl_prefix}beust-jcommander
+BuildRequires:  %{?scl_prefix}cglib
+BuildRequires:  %{?scl_prefix}maven-dependency-plugin
+BuildRequires:  %{?scl_prefix}maven-plugin-build-helper
+BuildRequires:  %{?scl_prefix}maven-assembly-plugin
+BuildRequires:  %{?scl_prefix}maven-invoker-plugin
+BuildRequires:  %{?scl_prefix}objectweb-asm
+BuildRequires:  %{?scl_prefix}xmlunit
 
-Requires:       maven >= 3.0.5-14
+Requires:       %{?scl_prefix}maven >= 3.0.5-14
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -58,7 +58,7 @@ set -e -x
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
-ln -s %{_root_datadir}/maven target/dependency/apache-maven-$mver
+ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
 
 # skip ITs for now (mix of old & new XMvn config causes issues
@@ -82,9 +82,9 @@ set -e -x
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
 cp -r %{pkg_name}-%{version}*/* %{buildroot}%{_datadir}/%{pkg_name}/
-ln -sf %{_root_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
-ln -sf %{_root_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
-ln -sf %{_root_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
+ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
+ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
+ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
 
 
 # helper scripts
@@ -104,7 +104,7 @@ exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool \"\${@}\"" >%{buildroot}%{_bi
 done
 
 # copy over maven lib directory
-cp -r %{_root_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
+cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
@@ -130,17 +130,17 @@ build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice
 
 # Symlink some of Maven JARs
 pushd %{buildroot}%{_datadir}/%{pkg_name}/lib/
-ln -sf %{_root_datadir}/maven/lib/maven-aether-provider.jar
-ln -sf %{_root_datadir}/maven/lib/maven-artifact.jar
-ln -sf %{_root_datadir}/maven/lib/maven-compat.jar
-ln -sf %{_root_datadir}/maven/lib/maven-core.jar
-ln -sf %{_root_datadir}/maven/lib/maven-embedder.jar
-ln -sf %{_root_datadir}/maven/lib/maven-model-builder.jar
-ln -sf %{_root_datadir}/maven/lib/maven-model.jar
-ln -sf %{_root_datadir}/maven/lib/maven-plugin-api.jar
-ln -sf %{_root_datadir}/maven/lib/maven-repository-metadata.jar
-ln -sf %{_root_datadir}/maven/lib/maven-settings-builder.jar
-ln -sf %{_root_datadir}/maven/lib/maven-settings.jar
+ln -sf %{_datadir}/maven/lib/maven-aether-provider.jar
+ln -sf %{_datadir}/maven/lib/maven-artifact.jar
+ln -sf %{_datadir}/maven/lib/maven-compat.jar
+ln -sf %{_datadir}/maven/lib/maven-core.jar
+ln -sf %{_datadir}/maven/lib/maven-embedder.jar
+ln -sf %{_datadir}/maven/lib/maven-model-builder.jar
+ln -sf %{_datadir}/maven/lib/maven-model.jar
+ln -sf %{_datadir}/maven/lib/maven-plugin-api.jar
+ln -sf %{_datadir}/maven/lib/maven-repository-metadata.jar
+ln -sf %{_datadir}/maven/lib/maven-settings-builder.jar
+ln -sf %{_datadir}/maven/lib/maven-settings.jar
 popd
 
 # /usr/bin/xmvn script
@@ -149,7 +149,7 @@ export M2_HOME=\"\${M2_HOME:-%{_datadir}/%{pkg_name}}\"
 exec mvn \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}
 
 # make sure our conf is identical to maven so yum won't freak out
-cp -P %{_root_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
+cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
 %{?scl:EOF}
 
 %pretrans -p <lua>
@@ -171,6 +171,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Feb 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.4
+- SCL-ize requires and build-requires
+
 * Thu Feb 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.3
 - Rebuild to regenerate auto-requires
 
