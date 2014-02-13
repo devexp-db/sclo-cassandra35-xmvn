@@ -44,6 +44,7 @@ This package provides %{summary}.
 %prep
 %setup -q -n %{pkg_name}-%{version}
 %{?scl:scl enable %{scl} - <<"EOF"}
+set -e -x
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
@@ -66,6 +67,7 @@ rm -rf src/it
 
 %build
 %{?scl:scl enable %{scl} - <<"EOF"}
+set -e -x
 %mvn_build -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
@@ -75,6 +77,7 @@ chmod -R +rwX %{pkg_name}-%{version}*
 
 %install
 %{?scl:scl enable %{scl} - <<"EOF"}
+set -e -x
 %mvn_install
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
