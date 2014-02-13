@@ -16,7 +16,7 @@ Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
 Patch0003:      0003-Port-to-Sonatype-Sisu.patch
 Patch0004:      0004-Add-support-for-absolute-artifact-symlinks.patch
 
-BuildRequires:  %{?scl_prefix}maven >= 3.0.5-14
+BuildRequires:  %{?scl_prefix}maven >= 3.0.5-16.3
 BuildRequires:  %{?scl_prefix}maven-local
 BuildRequires:  %{?scl_prefix}beust-jcommander
 BuildRequires:  %{?scl_prefix}cglib
@@ -158,6 +158,7 @@ end
 %changelog
 * Thu Feb 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.4
 - SCL-ize requires and build-requires
+- Bump version requirement on maven
 
 * Thu Feb 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.3
 - Rebuild to regenerate auto-requires
