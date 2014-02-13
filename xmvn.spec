@@ -128,21 +128,6 @@ build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice
 #    exit 1
 #fi
 
-# Symlink some of Maven JARs
-pushd %{buildroot}%{_datadir}/%{pkg_name}/lib/
-ln -sf %{_datadir}/maven/lib/maven-aether-provider.jar
-ln -sf %{_datadir}/maven/lib/maven-artifact.jar
-ln -sf %{_datadir}/maven/lib/maven-compat.jar
-ln -sf %{_datadir}/maven/lib/maven-core.jar
-ln -sf %{_datadir}/maven/lib/maven-embedder.jar
-ln -sf %{_datadir}/maven/lib/maven-model-builder.jar
-ln -sf %{_datadir}/maven/lib/maven-model.jar
-ln -sf %{_datadir}/maven/lib/maven-plugin-api.jar
-ln -sf %{_datadir}/maven/lib/maven-repository-metadata.jar
-ln -sf %{_datadir}/maven/lib/maven-settings-builder.jar
-ln -sf %{_datadir}/maven/lib/maven-settings.jar
-popd
-
 # /usr/bin/xmvn script
 echo "#!/bin/sh -e
 export M2_HOME=\"\${M2_HOME:-%{_datadir}/%{pkg_name}}\"
