@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.2%{?dist}
+Release:        5.3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -171,6 +171,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Feb 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.3
+- Rebuild to regenerate auto-requires
+
 * Wed Feb 12 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.2
 - Use Maven from %%{_root_datadir} for now
 - Fix quotation in nested here-documents
