@@ -27,6 +27,9 @@ BuildRequires:  %{?scl_prefix}maven-invoker-plugin
 BuildRequires:  %{?scl_prefix}objectweb-asm
 BuildRequires:  %{?scl_prefix}xmlunit
 
+# XXX temp
+BuildRequires: xmvn
+
 Requires:       %{?scl_prefix}maven >= 3.0.5-14
 
 %description
