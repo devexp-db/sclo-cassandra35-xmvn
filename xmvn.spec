@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.4%{?dist}
+Release:        5.5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -26,9 +26,6 @@ BuildRequires:  %{?scl_prefix}maven-assembly-plugin
 BuildRequires:  %{?scl_prefix}maven-invoker-plugin
 BuildRequires:  %{?scl_prefix}objectweb-asm
 BuildRequires:  %{?scl_prefix}xmlunit
-
-# XXX temp
-BuildRequires: xmvn
 
 Requires:       %{?scl_prefix}maven >= 3.0.5-14
 
@@ -159,6 +156,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Feb 14 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.5
+- Remove temp BR
+
 * Thu Feb 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.4
 - SCL-ize requires and build-requires
 - Bump version requirement on maven
