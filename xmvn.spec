@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.5%{?dist}
+Release:        5.6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -109,24 +109,10 @@ cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
 
-# XXX temp until guice is rebuilt and no_aop has proper manifest so that xmvn-subst will work on it
-for tool in subst resolver bisect installer;do
-    # guice-no_aop doesn't contain correct pom.properties. Manually replace with symlinks
-    pushd %{buildroot}%{_datadir}/%{pkg_name}/lib/$tool
-       rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/google-guice*
-       rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/sisu-guice*
-       build-jar-repository . guice/google-guice-no_aop
-    popd
-done
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/google-guice*
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/lib/sisu-guice*
-build-jar-repository %{buildroot}%{_datadir}/%{pkg_name}/lib/ guice/google-guice-no_aop
-
-# reenable after build
-#if [[ `find %{buildroot}%{_datadir}/%{pkg_name}/lib -type f -name '*.jar' -not -name '*%{pkg_name}*' | wc -l` -ne 0 ]];then
-#    echo "Some jar files were not symlinked during build. Aborting"
-#    exit 1
-#fi
+if [[ `find %{buildroot}%{_datadir}/%{pkg_name}/lib -type f -name '*.jar' -not -name '*%{pkg_name}*' | wc -l` -ne 0 ]];then
+    echo "Some jar files were not symlinked during build. Aborting"
+    exit 1
+fi
 
 # /usr/bin/xmvn script
 echo "#!/bin/sh -e
@@ -156,6 +142,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Feb 17 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.6
+- Remove temporary hacks
+
 * Fri Feb 14 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.5
 - Remove temp BR
 
