@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.6%{?dist}
+Release:        5.7%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -24,7 +24,9 @@ BuildRequires:  %{?scl_prefix}maven-dependency-plugin
 BuildRequires:  %{?scl_prefix}maven-plugin-build-helper
 BuildRequires:  %{?scl_prefix}maven-assembly-plugin
 BuildRequires:  %{?scl_prefix}maven-invoker-plugin
+BuildRequires:  %{?scl_prefix}maven-plugin-plugin
 BuildRequires:  %{?scl_prefix}objectweb-asm
+BuildRequires:  %{?scl_prefix}plexus-containers-component-metadata
 BuildRequires:  %{?scl_prefix}xmlunit
 
 Requires:       %{?scl_prefix}maven >= 3.0.5-14
@@ -142,6 +144,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Feb 17 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.7
+- Add missing BR: maven-plugin-plugin, plexus-containers-component-metadata
+
 * Mon Feb 17 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.6
 - Remove temporary hacks
 
