@@ -137,6 +137,7 @@ for key, dir in pairs({"conf", "conf/logging", "boot"}) do
 end
 
 %files -f .mfiles
+%dir %{_javadir}/%{name}
 %doc LICENSE NOTICE
 %doc AUTHORS README
 %attr(755,-,-) %{_bindir}/*
