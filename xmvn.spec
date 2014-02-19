@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.8%{?dist}
+Release:        5.9%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -125,15 +125,6 @@ exec mvn \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
 %{?scl:EOF}
 
-%pretrans -p <lua>
--- we changed symlink to dir in 0.5.0-1, workaround RPM issues
-for key, dir in pairs({"conf", "conf/logging", "boot"}) do
-    path = "%{_datadir}/%{pkg_name}/" .. dir
-    if posix.readlink(path) then
-       os.remove(path)
-    end
-end
-
 %files -f .mfiles
 %{_javadir}/%{pkg_name}
 %doc LICENSE NOTICE
@@ -145,6 +136,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Feb 19 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.9
+- Remove workaround for rhbz#447156
+
 * Tue Feb 18 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.8
 - Mass rebuild 2014-02-18
 
