@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.5.0
-Release:        0.19.gitcb3a0a6%{?dist}
+Release:        0.20.gitcb3a0a6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -147,6 +147,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Feb 19 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-0.20.gitcb3a0a6
+- Fix unowned directory
+
 * Tue Jan 14 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-0.19.gitcb3a0a6
 - Update to pre-release of upstream version 1.5.0
 
