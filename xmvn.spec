@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        1.3.0
-Release:        5.9%{?dist}
+Release:        5.10%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -136,6 +136,9 @@ cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/co
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Feb 19 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.10
+- Mass rebuild 2014-02-19
+
 * Wed Feb 19 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.9
 - Remove workaround for rhbz#447156
 
