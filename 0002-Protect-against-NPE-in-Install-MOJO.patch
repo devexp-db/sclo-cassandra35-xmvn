@@ -1,0 +1,34 @@
+From bbe137765c8ac11c9adcd52e7063453b1c092735 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 28 Mar 2014 19:30:36 +0100
+Subject: [PATCH 2/3] Protect against NPE in Install MOJO
+
+---
+ .../java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java   | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+index 0e64792..bbff4c2 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+@@ -130,7 +130,7 @@ public class InstallMojo
+                 logger.debug( "Installing main artifact " + mainArtifact );
+                 logger.debug( "Artifact file is " + mainArtifact.getFile() );
+ 
+-                if ( !mainArtifact.getFile().isFile() )
++                if ( mainArtifact.getFile() != null && !mainArtifact.getFile().isFile() )
+                 {
+                     logger.info( "Skipping installation of artifact " + mainArtifact.getFile()
+                         + ": artifact file is not a regular file" );
+@@ -151,7 +151,7 @@ public class InstallMojo
+                     logger.debug( "Installing attached artifact " + attachedArtifact );
+                     logger.debug( "Artifact file is " + mavenArtifact.getFile() );
+ 
+-                    if ( !mavenArtifact.getFile().isFile() )
++                    if ( mavenArtifact.getFile() != null && !mavenArtifact.getFile().isFile() )
+                     {
+                         logger.info( "Skipping installation of attached artifact " + attachedArtifact
+                             + ": artifact file is not a regular file" );
+-- 
+1.8.5.3
+
