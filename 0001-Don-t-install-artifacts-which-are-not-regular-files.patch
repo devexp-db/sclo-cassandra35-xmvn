@@ -1,0 +1,46 @@
+From 6beaea7bae7bbe5fb17b1d9c9b13bb2d4072bc08 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 28 Mar 2014 16:56:12 +0100
+Subject: [PATCH] Don't install artifacts which are not regular files
+
+This fixes rhbz#1078967
+---
+ .../maven/rpminstall/plugin/InstallMojo.java              | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+index 67f34d3..0e64792 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+@@ -130,6 +130,13 @@ public class InstallMojo
+                 logger.debug( "Installing main artifact " + mainArtifact );
+                 logger.debug( "Artifact file is " + mainArtifact.getFile() );
+ 
++                if ( !mainArtifact.getFile().isFile() )
++                {
++                    logger.info( "Skipping installation of artifact " + mainArtifact.getFile()
++                        + ": artifact file is not a regular file" );
++                    mainArtifact = mainArtifact.setFile( null );
++                }
++
+                 Path rawPom = project.getFile().toPath();
+                 Path effectivePom = saveEffectivePom( project.getModel() );
+                 logger.debug( "Raw POM path: " + rawPom );
+@@ -142,6 +149,14 @@ public class InstallMojo
+                     Artifact attachedArtifact = aetherArtifact( mavenArtifact );
+                     attachedArtifact = attachedArtifact.setFile( mavenArtifact.getFile() );
+                     logger.debug( "Installing attached artifact " + attachedArtifact );
++                    logger.debug( "Artifact file is " + mavenArtifact.getFile() );
++
++                    if ( !mavenArtifact.getFile().isFile() )
++                    {
++                        logger.info( "Skipping installation of attached artifact " + attachedArtifact
++                            + ": artifact file is not a regular file" );
++                        continue;
++                    }
+ 
+                     deployArtifact( attachedArtifact, null, null );
+                 }
+-- 
+1.8.5.3
+

@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.5.0
-Release:        0.22.gitcb3a0a6%{?dist}
+Release:        0.23.gitcb3a0a6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -10,6 +10,8 @@ BuildArch:      noarch
 # git clone git://git.fedorahosted.org/git/%{name}.git
 # (cd ./%{name} && git archive --format tar --prefix %{name}-%{version}/ cb3a0a6 | xz) >%{name}-%{version}-SNAPSHOT.tar.xz
 Source0:        %{name}-%{version}-SNAPSHOT.tar.xz
+
+Patch0:         0001-Don-t-install-artifacts-which-are-not-regular-files.patch
 
 BuildRequires:  maven >= 3.1.1-13
 BuildRequires:  maven-local
@@ -38,6 +40,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch0 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -148,6 +151,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Mar 28 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-0.23.gitcb3a0a6
+- Skip installation of artifacts which files are not regular files
+- Resolves: rhbz#1078967
+
 * Mon Mar 17 2014 Michal Srb <msrb@redhat.com> - 1.5.0-0.22.gitcb3a0a6
 - Add missing BR: modello-maven-plugin
 
