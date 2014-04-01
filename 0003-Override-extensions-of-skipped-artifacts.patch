@@ -1,4 +1,4 @@
-From fa4de67d690423739343bc1a24f3e4536d65a900 Mon Sep 17 00:00:00 2001
+From 124340c288e5276968c0a7463a02eeadcca89772 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Fri, 28 Mar 2014 19:38:30 +0100
 Subject: [PATCH 3/3] Override extensions of skipped artifacts
@@ -7,14 +7,46 @@ Artifacts which are not installed must set their exiension to "pom",
 otherwise XMvn Installed would fail with "POM artifact has extension
 different from 'pom': jar".  This limitation is fixed in XMvn 2.x.
 ---
- .../java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java  | 3 ++-
- .../main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java   | 5 ++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ .../org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java    | 4 ++--
+ .../org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java     | 7 ++++---
+ .../main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java | 5 ++++-
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java
+index 789988e..a9f07c1 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/BuilddepMojo.java
+@@ -78,7 +78,7 @@ public class BuilddepMojo
+ 
+             for ( MavenProject project : reactorProjects )
+             {
+-                Artifact projectArtifact = Utils.aetherArtifact( project.getArtifact() );
++                Artifact projectArtifact = Utils.aetherArtifact( project.getArtifact(), null );
+                 projectArtifact = projectArtifact.setFile( project.getFile() );
+ 
+                 DependencyExtractionRequest request = new DependencyExtractionRequest();
+@@ -96,7 +96,7 @@ public class BuilddepMojo
+ 
+                 reactorArtifacts.add( projectArtifact );
+                 for ( org.apache.maven.artifact.Artifact attachedArtifact : project.getAttachedArtifacts() )
+-                    reactorArtifacts.add( Utils.aetherArtifact( attachedArtifact ) );
++                    reactorArtifacts.add( Utils.aetherArtifact( attachedArtifact, null ) );
+             }
+ 
+             dependencies.removeAll( reactorArtifacts );
 diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
-index bbff4c2..3a25171 100644
+index bbff4c2..19525b3 100644
 --- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
 +++ b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java
+@@ -88,7 +88,7 @@ public class InstallMojo
+             {
+                 systemDepsFound = true;
+ 
+-                logger.error( "Reactor project " + aetherArtifact( project.getArtifact() )
++                logger.error( "Reactor project " + aetherArtifact( project.getArtifact(), null )
+                     + " has system-scoped dependencies: " + ArtifactUtils.collectionToString( systemDeps, true ) );
+             }
+         }
 @@ -125,7 +125,7 @@ public class InstallMojo
          {
              for ( MavenProject project : reactorProjects )
@@ -32,6 +64,15 @@ index bbff4c2..3a25171 100644
                      mainArtifact = mainArtifact.setFile( null );
                  }
  
+@@ -146,7 +147,7 @@ public class InstallMojo
+ 
+                 for ( org.apache.maven.artifact.Artifact mavenArtifact : project.getAttachedArtifacts() )
+                 {
+-                    Artifact attachedArtifact = aetherArtifact( mavenArtifact );
++                    Artifact attachedArtifact = aetherArtifact( mavenArtifact, null );
+                     attachedArtifact = attachedArtifact.setFile( mavenArtifact.getFile() );
+                     logger.debug( "Installing attached artifact " + attachedArtifact );
+                     logger.debug( "Artifact file is " + mavenArtifact.getFile() );
 diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java b/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java
 index 623e414..31d7da9 100644
 --- a/xmvn-mojo/src/main/java/org/fedoraproject/maven/rpminstall/plugin/Utils.java
