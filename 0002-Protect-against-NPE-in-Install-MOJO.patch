@@ -1,7 +1,7 @@
 From bbe137765c8ac11c9adcd52e7063453b1c092735 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Fri, 28 Mar 2014 19:30:36 +0100
-Subject: [PATCH 2/3] Protect against NPE in Install MOJO
+Subject: [PATCH 2/4] Protect against NPE in Install MOJO
 
 ---
  .../java/org/fedoraproject/maven/rpminstall/plugin/InstallMojo.java   | 4 ++--
@@ -30,5 +30,5 @@ index 0e64792..bbff4c2 100644
                          logger.info( "Skipping installation of attached artifact " + attachedArtifact
                              + ": artifact file is not a regular file" );
 -- 
-1.8.5.3
+1.9.0
 

@@ -1,0 +1,72 @@
+From cdcf2ebb4bc1be2f95d672ad62576c60b59b781a Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 9 Apr 2014 18:12:07 +0200
+Subject: [PATCH 4/4] Use ASM 5.0.1 directly instead of Sisu-shaded ASM
+
+---
+ xmvn-core/pom.xml                                                 | 4 ++++
+ .../org/fedoraproject/maven/installer/impl/DefaultInstaller.java  | 8 ++++----
+ xmvn-parent/pom.xml                                               | 6 ++++++
+ 3 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/xmvn-core/pom.xml b/xmvn-core/pom.xml
+index ca1d00d..f4c0585 100644
+--- a/xmvn-core/pom.xml
++++ b/xmvn-core/pom.xml
+@@ -68,6 +68,10 @@
+       <groupId>org.apache.ivy</groupId>
+       <artifactId>ivy</artifactId>
+     </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm</artifactId>
++    </dependency>
+   </dependencies>
+   <build>
+     <plugins>
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+index 6c7242b..591cc82 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+@@ -50,10 +50,10 @@ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.util.StringUtils;
+ import org.eclipse.aether.artifact.Artifact;
+ import org.eclipse.aether.artifact.DefaultArtifact;
+-import org.eclipse.sisu.space.asm.ClassReader;
+-import org.eclipse.sisu.space.asm.ClassVisitor;
+-import org.eclipse.sisu.space.asm.MethodVisitor;
+-import org.eclipse.sisu.space.asm.Opcodes;
++import org.objectweb.asm.ClassReader;
++import org.objectweb.asm.ClassVisitor;
++import org.objectweb.asm.MethodVisitor;
++import org.objectweb.asm.Opcodes;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.InstallerSettings;
+diff --git a/xmvn-parent/pom.xml b/xmvn-parent/pom.xml
+index 115c37e..e1676bf 100644
+--- a/xmvn-parent/pom.xml
++++ b/xmvn-parent/pom.xml
+@@ -75,6 +75,7 @@
+     <project.build.sourceEncoding>US-ASCII</project.build.sourceEncoding>
+ 
+     <aetherVersion>0.9.0.M4</aetherVersion>
++    <asmVersion>5.0.1</asmVersion>
+     <ivyVersion>2.3.0</ivyVersion>
+     <jcommanderVersion>1.32</jcommanderVersion>
+     <guiceVersion>3.1.8</guiceVersion>
+@@ -202,6 +203,11 @@
+         <artifactId>ivy</artifactId>
+         <version>${ivyVersion}</version>
+       </dependency>
++      <dependency>
++        <groupId>org.ow2.asm</groupId>
++        <artifactId>asm</artifactId>
++        <version>${asmVersion}</version>
++      </dependency>
+     </dependencies>
+   </dependencyManagement>
+   <dependencies>
+-- 
+1.9.0
+

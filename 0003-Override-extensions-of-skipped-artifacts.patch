@@ -1,7 +1,7 @@
 From 124340c288e5276968c0a7463a02eeadcca89772 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Fri, 28 Mar 2014 19:38:30 +0100
-Subject: [PATCH 3/3] Override extensions of skipped artifacts
+Subject: [PATCH 3/4] Override extensions of skipped artifacts
 
 Artifacts which are not installed must set their exiension to "pom",
 otherwise XMvn Installed would fail with "POM artifact has extension
@@ -97,5 +97,5 @@ index 623e414..31d7da9 100644
          artifact = ArtifactUtils.setStereotype( artifact, stereotype );
          artifact = artifact.setFile( artifactFile );
 -- 
-1.8.5.3
+1.9.0
 

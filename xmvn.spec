@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.5.0
-Release:        0.24.gitcb3a0a6%{?dist}
+Release:        0.25.gitcb3a0a6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -14,6 +14,7 @@ Source0:        %{name}-%{version}-SNAPSHOT.tar.xz
 Patch0:         0001-Don-t-install-artifacts-which-are-not-regular-files.patch
 Patch1:         0002-Protect-against-NPE-in-Install-MOJO.patch
 Patch2:         0003-Override-extensions-of-skipped-artifacts.patch
+Patch3:         0004-Use-ASM-5.0.1-directly-instead-of-Sisu-shaded-ASM.patch
 
 BuildRequires:  maven >= 3.1.1-13
 BuildRequires:  maven-local
@@ -23,6 +24,7 @@ BuildRequires:  maven-dependency-plugin
 BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
+BuildRequires:  objectweb-asm
 BuildRequires:  xmlunit
 BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
 
@@ -45,6 +47,7 @@ This package provides %{summary}.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -155,6 +158,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Apr 22 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-0.25.gitcb3a0a6
+- Use ASM 5.0.1 directly instead of Sisu-shaded ASM
+
 * Fri Mar 28 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-0.24.gitcb3a0a6
 - Override extensions of skipped artifacts
 
