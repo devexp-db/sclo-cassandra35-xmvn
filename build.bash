@@ -2,9 +2,6 @@
 
 resultdir="/var/lib/mock/fedora-rawhide-x86_64/result"
 
-# download spec file
-curl 'http://pkgs.fedoraproject.org/cgit/xmvn.git/plain/xmvn.spec?h=jenkins' > xmvn.spec
-
 # create directories
 repo=RPM/latest/
 [[ ! -d ${repo} ]] && mkdir -p ${repo}
