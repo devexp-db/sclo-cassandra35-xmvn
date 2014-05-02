@@ -6,11 +6,7 @@ License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 
-#Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
-
-# git clone git://git.fedorahosted.org/git/%{name}.git
-# (cd ./%{name} && git archive --format tar --prefix %{name}-%{version}/ cb3a0a6 | xz) >%{name}-%{version}-SNAPSHOT.tar.xz
-Source0:        %{name}-%{version}-SNAPSHOT.tar.xz
+Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires:  maven >= 3.2.1-3
 BuildRequires:  maven-local
