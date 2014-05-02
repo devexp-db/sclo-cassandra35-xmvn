@@ -115,11 +115,6 @@ for tool in subst resolver bisect installer;do
     popd
 done
 
-# workaround for rhbz#1012982
-rm %{buildroot}%{_datadir}/%{name}/lib/google-guice-no_aop.jar
-build-jar-repository %{buildroot}%{_datadir}/%{name}/lib/ \
-                     guice/google-guice-no_aop
-
 if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
     echo "Some jar files were not symlinked during build. Aborting"
     exit 1
