@@ -103,23 +103,7 @@ done
 cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
-%{name}-subst %{buildroot}%{_datadir}/%{name}/
-
-for tool in subst resolver bisect installer;do
-    # sisu doesn't contain pom.properties. Manually replace with symlinks
-    pushd %{buildroot}%{_datadir}/%{name}/lib/$tool
-        rm org.eclipse.sisu*jar sisu-guice*jar
-        build-jar-repository . org.eclipse.sisu.inject \
-                               org.eclipse.sisu.plexus \
-                               guice/google-guice-no_aop
-    popd
-done
-
-if [[ `find %{buildroot}%{_datadir}/%{name}/lib -type f -name '*.jar' -not -name '*%{name}*' | wc -l` -ne 0 ]];then
-    echo "Some jar files were not symlinked during build. Aborting"
-    exit 1
-fi
-
+%{name}-subst -s %{buildroot}%{_datadir}/%{name}/
 
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
