@@ -18,15 +18,14 @@ sed -i "s/^Release:\s\+[0-9.]*%{?dist}$/Release: ${release}/" xmvn.spec
 # make tarball
 git archive -v --prefix=xmvn-${version}/ HEAD | xz > xmvn-${version}.tar.xz
 
-# print root.log and build.log in case of failure
-trap "cat ${resultdir}/root.log | tail -30; cat ${resultdir}/build.log || :" 0
-
 # crate srpm
 rm -f SRPMS/*
 rpmbuild -bs --clean --define "_topdir `pwd`" --define "_sourcedir `pwd`" xmvn.spec
 
 # build RPM with custom mock config
 rm -Rf ${resultdir}/*
+# print root.log and build.log in case of failure
+trap "cat ${resultdir}/root.log | tail -30; cat ${resultdir}/build.log || :" 0
 mock -r fedora-rawhide-x86_64 SRPMS/*.src.rpm
 
 # remove unneeded stuff
