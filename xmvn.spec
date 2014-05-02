@@ -190,7 +190,7 @@ done
 cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
-%{name}-subst -s %{buildroot}%{_datadir}/%{name}/
+%{name}-subst %{buildroot}%{_datadir}/%{name}/
 
 # /usr/bin/xmvn script
 cat <<EOF >%{buildroot}%{_bindir}/%{name}
