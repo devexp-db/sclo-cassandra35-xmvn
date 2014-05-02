@@ -35,6 +35,100 @@ manage system artifact repository and use it to resolve Maven
 artifacts in offline mode, as well as Maven plugins to help with
 creating RPM packages containing Maven artifacts.
 
+%package        parent-pom
+Summary:        XMvn Parent POM
+
+%description    parent-pom
+This package provides XMvn parent POM.
+
+%package        api
+Summary:        XMvn API
+
+%description    api
+This package provides XMvn API module which contains public interface
+for functionality implemented by XMvn Core.
+
+%package        launcher
+Summary:        XMvn Launcher
+
+%description    launcher
+This package provides XMvn Launcher module, which provides a way of
+launching XMvn running in isolated class realm and locating XMVn
+services.
+
+%package        core
+Summary:        XMvn Core
+
+%description    core
+This package provides XMvn Core module, which implements the essential
+functionality of XMvn such as resolution of artifacts from system
+repository.
+
+%package        connector-aether
+Summary:        XMvn Connector for Eclipse Aether
+
+%description    connector-aether
+This package provides XMvn Connector for Eclipse Aether, which
+provides integration of Eclipse Aether with XMvn.  It provides an
+adapter which allows XMvn resolver to be used as Aether workspace
+reader.
+
+%package        connector-ivy
+Summary:        XMvn Connector for Apache Ivy
+
+%description    connector-ivy
+This package provides XMvn Connector for Apache Ivy, which provides
+integration of Apache Ivy with XMvn.  It provides an adapter which
+allows XMvn resolver to be used as Ivy resolver.
+
+%package        mojo
+Summary:        XMvn MOJO
+
+%description    mojo
+This package provides XMvn MOJO, which is a Maven plugin that consists
+of several MOJOs.  Some goals of these MOJOs are intended to be
+attached to default Maven lifecycle when building packages, others can
+be called directly from Maven command line.
+
+%package        tools-pom
+Summary:        XMvn Tools POM
+
+%description    tools-pom
+This package provides XMvn Tools parent POM.
+
+%package        resolve
+Summary:        XMvn Resolver
+
+%description    resolve
+This package provides XMvn Resolver, which is a very simple
+commald-line tool to resolve Maven artifacts from system repositories.
+Basically it's just an interface to artifact resolution mechanism
+implemented by XMvn Core.  The primary intended use case of XMvn
+Resolver is debugging local artifact repositories.
+
+%package        bisect
+Summary:        XMvn Bisect
+
+%description    bisect
+This package provides XMvn Bisect, which is a debugging tool that can
+diagnose build failures by using bisection method.
+
+%package        subst
+Summary:        XMvn Subst
+
+%description    subst
+This package provides XMvn Subst, which is a tool that can substitute
+Maven artifact files with symbolic links to corresponding files in
+artifact repository.
+
+%package        install
+Summary:        XMvn Install
+
+%description    install
+This package provides XMvn Install is a command-line interface to XMvn
+installer.  The installer reads reactor metadata and performs artifact
+installation according to specified configuration.
+
 %package        javadoc
 Summary:        API documentation for %{name}
 
@@ -57,7 +151,7 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 
-# skip ITs for now (mix of old & new XMvn config causes issues
+# skip ITs for now (mix of old & new XMvn config causes issues)
 rm -rf src/it
 
 # probably bug in configuration/modello?
@@ -65,10 +159,12 @@ sed -i 's|generated-site/resources/xsd/config|generated-site/xsd/config|' xmvn-c
 
 %build
 # XXX some tests fail on ARM for unknown reason, see why
-%mvn_build -f -X
+%mvn_build -s -f -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{name}-%{version}*
+# These are installed as doc
+rm -Rf %{name}-%{version}*/{AUTHORS,README,LICENSE,NOTICE}
 
 
 %install
@@ -87,16 +183,11 @@ install -m 755 xmvn-tools/src/main/bin/tool-script \
                %{buildroot}%{_datadir}/%{name}/bin/
 
 for tool in subst resolve bisect install;do
-    rm %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
-    ln -s tool-script \
-          %{buildroot}%{_datadir}/%{name}/bin/%{name}-$tool
-
     cat <<EOF >%{buildroot}%{_bindir}/%{name}-$tool
 #!/bin/sh -e
 exec %{_datadir}/%{name}/bin/%{name}-$tool "\${@}"
 EOF
     chmod +x %{buildroot}%{_bindir}/%{name}-$tool
-
 done
 
 # copy over maven lib directory
@@ -124,12 +215,67 @@ for key, dir in pairs({"conf", "conf/logging", "boot"}) do
     end
 end
 
-%files -f .mfiles
+%files
+%attr(755,-,-) %{_bindir}/%{name}
+%dir %{_datadir}/%{name}/bin
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/lib/*.jar
+%{_datadir}/%{name}/bin/m2.conf
+%{_datadir}/%{name}/bin/mvn
+%{_datadir}/%{name}/bin/mvnDebug
+%{_datadir}/%{name}/bin/mvnyjp
+%{_datadir}/%{name}/boot
+%{_datadir}/%{name}/conf
+
+%files parent-pom -f .mfiles-xmvn-parent
+%doc LICENSE NOTICE
+
+%files launcher -f .mfiles-xmvn-launcher
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/lib/core
+
+%files core -f .mfiles-xmvn-core
+
+%files api -f .mfiles-xmvn-api
 %dir %{_javadir}/%{name}
 %doc LICENSE NOTICE
 %doc AUTHORS README
-%attr(755,-,-) %{_bindir}/*
-%{_datadir}/%{name}
+
+%files connector-aether -f .mfiles-xmvn-connector-aether
+
+%files connector-ivy -f .mfiles-xmvn-connector-ivy
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/lib/ivy
+
+%files tools-pom -f .mfiles-xmvn-tools
+
+%files resolve -f .mfiles-xmvn-resolve
+%attr(755,-,-) %{_bindir}/%{name}-resolve
+%dir %{_datadir}/%{name}/bin
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/bin/%{name}-resolve
+%{_datadir}/%{name}/lib/resolver
+
+%files bisect -f .mfiles-xmvn-bisect
+%attr(755,-,-) %{_bindir}/%{name}-bisect
+%dir %{_datadir}/%{name}/bin
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/bin/%{name}-bisect
+%{_datadir}/%{name}/lib/bisect
+
+%files subst -f .mfiles-xmvn-subst
+%attr(755,-,-) %{_bindir}/%{name}-subst
+%dir %{_datadir}/%{name}/bin
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/bin/%{name}-subst
+%{_datadir}/%{name}/lib/subst
+
+%files install -f .mfiles-xmvn-install
+%attr(755,-,-) %{_bindir}/%{name}-install
+%dir %{_datadir}/%{name}/bin
+%dir %{_datadir}/%{name}/lib
+%{_datadir}/%{name}/bin/%{name}-install
+%{_datadir}/%{name}/lib/installer
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
