@@ -1,22 +1,18 @@
 Name:           xmvn
-Version:        1.5.0
-Release:        0.25.gitcb3a0a6%{?dist}
+Version:        2.0.0
+Release:        0%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
+
 #Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
 # git clone git://git.fedorahosted.org/git/%{name}.git
 # (cd ./%{name} && git archive --format tar --prefix %{name}-%{version}/ cb3a0a6 | xz) >%{name}-%{version}-SNAPSHOT.tar.xz
 Source0:        %{name}-%{version}-SNAPSHOT.tar.xz
 
-Patch0:         0001-Don-t-install-artifacts-which-are-not-regular-files.patch
-Patch1:         0002-Protect-against-NPE-in-Install-MOJO.patch
-Patch2:         0003-Override-extensions-of-skipped-artifacts.patch
-Patch3:         0004-Use-ASM-5.0.1-directly-instead-of-Sisu-shaded-ASM.patch
-
-BuildRequires:  maven >= 3.1.1-13
+BuildRequires:  maven >= 3.2.1-3
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -25,10 +21,13 @@ BuildRequires:  maven-plugin-build-helper
 BuildRequires:  maven-assembly-plugin
 BuildRequires:  maven-invoker-plugin
 BuildRequires:  objectweb-asm
+BuildRequires:  modello
 BuildRequires:  xmlunit
-BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
+BuildRequires:  apache-ivy
+BuildRequires:  sisu-mojos
+BuildRequires:  junit
 
-Requires:       maven >= 3.1.1-13
+Requires:       maven >= 3.2.1-3
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -44,10 +43,9 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+
+# In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
+%mvn_alias :xmvn-connector-aether :xmvn-connector
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -62,9 +60,12 @@ ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
 
+# probably bug in configuration/modello?
+sed -i 's|generated-site/resources/xsd/config|generated-site/xsd/config|' xmvn-core/pom.xml
+
 %build
 # XXX some tests fail on ARM for unknown reason, see why
-%mvn_build -f
+%mvn_build -f -X
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{name}-%{version}*
@@ -103,9 +104,6 @@ cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{name}-subst %{buildroot}%{_datadir}/%{name}/
-for jar in core connector;do
-    ln -sf %{_javadir}/%{name}/%{name}-$jar.jar %{buildroot}%{_datadir}/%{name}/lib
-done
 
 for tool in subst resolver bisect installer;do
     # sisu doesn't contain pom.properties. Manually replace with symlinks
