@@ -134,6 +134,8 @@ This package provides %{summary}.
 %prep
 %setup -q
 
+%mvn_package :xmvn __noinstall
+
 # In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
 %mvn_alias :xmvn-connector-aether :xmvn-connector
 
@@ -175,9 +177,6 @@ ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{name}/bin/mvnyjp
 
 # helper scripts
 install -d -m 755 %{buildroot}%{_bindir}
-install -m 755 xmvn-tools/src/main/bin/tool-script \
-               %{buildroot}%{_datadir}/%{name}/bin/
-
 for tool in subst resolve bisect install;do
     cat <<EOF >%{buildroot}%{_bindir}/%{name}-$tool
 #!/bin/sh -e
@@ -216,10 +215,12 @@ end
 %dir %{_datadir}/%{name}/bin
 %dir %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/lib/*.jar
+%{_datadir}/%{name}/lib/ext
 %{_datadir}/%{name}/bin/m2.conf
 %{_datadir}/%{name}/bin/mvn
 %{_datadir}/%{name}/bin/mvnDebug
 %{_datadir}/%{name}/bin/mvnyjp
+%{_datadir}/%{name}/bin/xmvn
 %{_datadir}/%{name}/boot
 %{_datadir}/%{name}/conf
 
@@ -242,6 +243,8 @@ end
 %files connector-ivy -f .mfiles-xmvn-connector-ivy
 %dir %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/lib/ivy
+
+%files mojo -f .mfiles-xmvn-mojo
 
 %files tools-pom -f .mfiles-xmvn-tools
 
