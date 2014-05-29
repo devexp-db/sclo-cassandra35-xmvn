@@ -135,12 +135,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q
-
-# Skip patch application on Jenkins - it is supposed to always use the
-# latest vanilla upstream snapshot.
-%if !0%{?jenkins}
 %patch0001 -p1
-%endif
 
 %mvn_package :xmvn __noinstall
 

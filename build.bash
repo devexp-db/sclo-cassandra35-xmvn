@@ -12,6 +12,11 @@ release=$(git describe --match="[^(jenkins)].*" --tags | sed 's/[^-]*-/0./;s/-/.
 sed -i "s/^Version:\s\+[0-9.]*$/Version: ${version}/" xmvn.spec
 sed -i "s/^Release:\s\+[0-9.]*%{?dist}$/Release: ${release}/" xmvn.spec
 
+# Skip patch application on Jenkins - it is supposed to always use the
+# latest vanilla upstream snapshot.
+sed -i "/^Patch[0-9]*:/d" xmvn.spec
+sed -i "/^%patch[0-9]* -p/d" xmvn.spec
+
 # make tarball
 git archive -v --prefix=xmvn-${version}/ HEAD | xz > xmvn-${version}.tar.xz
 
