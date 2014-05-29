@@ -1,12 +1,14 @@
 Name:           xmvn
 Version:        2.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+
+Patch0001:      0001-Fix-JAR-post-processing-during-installation.patch
 
 BuildRequires:  maven >= 3.2.1-3
 BuildRequires:  maven-local
@@ -133,6 +135,12 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+
+# Skip patch application on Jenkins - it is supposed to always use the
+# latest vanilla upstream snapshot.
+%if !0%{?jenkins}
+%patch0001 -p1
+%endif
 
 %mvn_package :xmvn __noinstall
 
@@ -280,6 +288,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu May 29 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-2
+- Add patch for injecting Javapackages manifests
+
 * Thu May 29 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-1
 - Update to upstream version 2.0.0
 
