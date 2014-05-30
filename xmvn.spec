@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        2.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -9,6 +9,8 @@ BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
 
 Patch0001:      0001-Fix-JAR-post-processing-during-installation.patch
+Patch0002:      0002-Respect-xmvn.resolver.disableEffectivePom-property.patch
+Patch0003:      0003-Fix-return-code-of-xmvn-install.patch
 
 BuildRequires:  maven >= 3.2.1-3
 BuildRequires:  maven-local
@@ -136,6 +138,8 @@ This package provides %{summary}.
 %prep
 %setup -q
 %patch0001 -p1
+%patch0002 -p1
+%patch0003 -p1
 
 %mvn_package :xmvn __noinstall
 
@@ -283,6 +287,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri May 30 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-3
+- Add patch to support xmvn.resolver.disableEffectivePom property
+
 * Thu May 29 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-2
 - Add patch for injecting Javapackages manifests
 
