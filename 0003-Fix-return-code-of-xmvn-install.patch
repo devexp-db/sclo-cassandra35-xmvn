@@ -1,4 +1,4 @@
-From 4f01aad38d63a4f70a2ac08a9264690ffc8df133 Mon Sep 17 00:00:00 2001
+From ece7609ff20c64cd58a7b38fdb851b0fd69b02d1 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Fri, 30 May 2014 09:34:41 +0200
 Subject: [PATCH 3/3] Fix return code of xmvn-install

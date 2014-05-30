@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        2.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -287,6 +287,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Fri May 30 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-4
+- Don't modify system properties during artifact resolution
+
 * Fri May 30 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-3
 - Add patch to support xmvn.resolver.disableEffectivePom property
 

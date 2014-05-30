@@ -1,4 +1,4 @@
-From f428fae1edfc860ed2bcabf920f3cba14a5a9ef5 Mon Sep 17 00:00:00 2001
+From 0584b0a5bc9aacfec5d668f891b1f8b26748c3c5 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Fri, 30 May 2014 06:52:05 +0200
 Subject: [PATCH 2/3] Respect xmvn.resolver.disableEffectivePom property
@@ -9,12 +9,12 @@ generated.  A property saying that dependencies were
 omitted is added so that XMvn won't generate effective
 POMs for artfacts with no dependencies in metadata.
 ---
- .../xmvn/resolver/impl/DefaultResolver.java        | 22 ++++++++++++++--------
+ .../xmvn/resolver/impl/DefaultResolver.java        | 23 ++++++++++++++--------
  .../resolver/impl/depmap/DepmapBasedResolver.java  |  2 +-
- 2 files changed, 15 insertions(+), 9 deletions(-)
+ 2 files changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/DefaultResolver.java b/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/DefaultResolver.java
-index 9572dc6..8c55ebe 100644
+index 9572dc6..3537988 100644
 --- a/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/DefaultResolver.java
 +++ b/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/DefaultResolver.java
 @@ -18,6 +18,7 @@ package org.fedoraproject.xmvn.resolver.impl;
@@ -25,16 +25,17 @@ index 9572dc6..8c55ebe 100644
  
  import javax.inject.Inject;
  import javax.inject.Named;
-@@ -73,6 +74,8 @@ public class DefaultResolver
+@@ -73,6 +74,9 @@ public class DefaultResolver
      @Override
      public ResolutionResult resolve( ResolutionRequest request )
      {
-+        Properties properties = System.getProperties();
++        Properties properties = new Properties();
++        properties.putAll( System.getProperties() );
 +
          // FIXME: bisect is not used
          Artifact artifact = request.getArtifact();
          logger.debug( "Trying to resolve artifact {}", artifact );
-@@ -90,9 +93,15 @@ public class DefaultResolver
+@@ -90,9 +94,15 @@ public class DefaultResolver
              compatVersion = artifact.getVersion();
          }
  
@@ -51,7 +52,7 @@ index 9572dc6..8c55ebe 100644
          {
              try
              {
-@@ -122,15 +131,12 @@ public class DefaultResolver
+@@ -122,15 +132,12 @@ public class DefaultResolver
          }
  
          // TODO: drop support for depmaps
