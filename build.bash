@@ -27,7 +27,7 @@ rpmbuild -bs --clean --define "_topdir `pwd`" --define "_sourcedir `pwd`" xmvn.s
 # build RPM with custom mock config
 rm -Rf ${resultdir}/*
 # print root.log and build.log in case of failure
-trap "cat ${resultdir}/root.log | tail -30; cat ${resultdir}/build.log || :" 0
+trap "cat ${resultdir}/root.log; cat ${resultdir}/build.log || :" 0
 mock -r ../..$PWD/fedora-rawhide-x86_64 SRPMS/*.src.rpm
 
 # remove unneeded stuff
