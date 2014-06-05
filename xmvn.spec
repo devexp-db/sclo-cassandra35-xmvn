@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        2.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -28,6 +28,9 @@ BuildRequires:  sisu-mojos
 BuildRequires:  junit
 
 Requires:       maven >= 3.2.1-3
+Requires:       xmvn-api = %{version}-%{release}
+Requires:       xmvn-connector-aether = %{version}-%{release}
+Requires:       xmvn-core = %{version}-%{release}
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -287,6 +290,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Jun  5 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-5
+- Add missing requires on subpackages
+
 * Fri May 30 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-4
 - Don't modify system properties during artifact resolution
 
