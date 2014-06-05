@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-resultdir="/var/lib/mock/javapackages-rawhide/result"
+resultdir="/var/lib/mock/xmvn-rawhide/result"
 
 # create directories
 repo=RPM/latest/
