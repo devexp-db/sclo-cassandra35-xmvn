@@ -28,7 +28,7 @@ rpmbuild -bs --clean --define "_topdir `pwd`" --define "_sourcedir `pwd`" xmvn.s
 rm -Rf ${resultdir}/*
 # print root.log and build.log in case of failure
 trap "cat ${resultdir}/root.log | tail -30; cat ${resultdir}/build.log || :" 0
-mock -D 'jenkins 1' -r fedora-rawhide-x86_64 SRPMS/*.src.rpm
+mock -r ../..$PWD/fedora-rawhide-x86_64 SRPMS/*.src.rpm
 
 # remove unneeded stuff
 rm -f xmvn-*.tar.xz
