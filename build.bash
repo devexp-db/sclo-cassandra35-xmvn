@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-resultdir="/var/lib/mock/fedora-rawhide-x86_64/result"
+resultdir="/var/lib/mock/javapackages-rawhide/result"
 
 # create directories
 repo=RPM/latest/
