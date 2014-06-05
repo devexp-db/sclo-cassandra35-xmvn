@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        2.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -12,7 +12,7 @@ Patch0001:      0001-Fix-JAR-post-processing-during-installation.patch
 Patch0002:      0002-Respect-xmvn.resolver.disableEffectivePom-property.patch
 Patch0003:      0003-Fix-return-code-of-xmvn-install.patch
 
-BuildRequires:  maven >= 3.2.1-3
+BuildRequires:  maven >= 3.2.1-10
 BuildRequires:  maven-local
 BuildRequires:  beust-jcommander
 BuildRequires:  cglib
@@ -290,6 +290,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Jun  5 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-6
+- Bump Maven version in build-requires
+
 * Thu Jun  5 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.0-5
 - Add missing requires on subpackages
 
