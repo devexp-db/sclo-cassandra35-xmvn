@@ -22,6 +22,7 @@ BuildRequires:  xmlunit
 BuildRequires:  apache-ivy
 BuildRequires:  sisu-mojos
 BuildRequires:  junit
+BuildRequires:  tycho
 
 Requires:       maven >= 3.2.1-3
 Requires:       xmvn-api = %{version}-%{release}
@@ -124,9 +125,18 @@ artifact repository.
 Summary:        XMvn Install
 
 %description    install
-This package provides XMvn Install is a command-line interface to XMvn
-installer.  The installer reads reactor metadata and performs artifact
-installation according to specified configuration.
+This package provides XMvn Install, which is a command-line interface
+to XMvn installer.  The installer reads reactor metadata and performs
+artifact installation according to specified configuration.
+
+%package        p2
+Summary:        XMvn P2
+Requires:       tycho >= 0.20.0
+
+%description    p2
+This package provides integration of XMvn with Eclipse Equinox
+P2. XMvn P2 allows Eclipse plugins and features to be installed using
+XMvn Installer.
 
 %package        javadoc
 Summary:        API documentation for %{name}
@@ -138,6 +148,7 @@ This package provides %{summary}.
 %setup -q
 
 %mvn_package :xmvn __noinstall
+%mvn_package :*p2* p2
 
 # In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
 %mvn_alias :xmvn-connector-aether :xmvn-connector
@@ -203,6 +214,11 @@ EOF
 
 # make sure our conf is identical to maven so yum won't freak out
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
+
+# TODO: Move this upstream
+ln -s %{_javadir}/eclipse/osgi.jar %{buildroot}%{_datadir}/%{name}/lib/installer
+ln -s %{_javadir}/%{name}/xmvn-p2-installer-plugin.jar %{buildroot}%{_datadir}/%{name}/lib/installer
+ln -s %{_javadir}/%{name}/org.fedoraproject.xmvn.p2.jar %{buildroot}%{_datadir}/%{name}/lib/installer
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
@@ -278,6 +294,13 @@ end
 %dir %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/bin/%{name}-install
 %{_datadir}/%{name}/lib/installer
+%exclude %{_datadir}/%{name}/lib/installer/orgi.jar
+%exclude %{_datadir}/%{name}/lib/installer/xmvn-p2-installer-plugin.jar
+%exclude %{_datadir}/%{name}/lib/installer/org.fedoraproject.xmvn.p2.jar
+
+%files p2 -f .mfiles-p2
+%{_datadir}/%{name}/lib/installer/orgi.jar
+%{_datadir}/%{name}/lib/installer/xmvn-p2-installer-plugin.jar
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
