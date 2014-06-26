@@ -147,6 +147,10 @@ This package provides %{summary}.
 %prep
 %setup -q
 
+# TODO: move this to javapackages-tools
+%mvn_package ::xml:p2metadata: __noinstall
+%mvn_package ::xml:p2artifacts: __noinstall
+
 %mvn_package :xmvn __noinstall
 %mvn_package :*p2* p2
 
@@ -171,7 +175,7 @@ sed -i 's|generated-site/resources/xsd/config|generated-site/xsd/config|' xmvn-c
 
 %build
 # XXX some tests fail on ARM for unknown reason, see why
-%mvn_build -s -f -X
+%mvn_build -s -f
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{name}-%{version}*
@@ -216,9 +220,9 @@ EOF
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
 
 # TODO: Move this upstream
-ln -s %{_javadir}/eclipse/osgi.jar %{buildroot}%{_datadir}/%{name}/lib/installer
-ln -s %{_javadir}/%{name}/xmvn-p2-installer-plugin.jar %{buildroot}%{_datadir}/%{name}/lib/installer
-ln -s %{_javadir}/%{name}/org.fedoraproject.xmvn.p2.jar %{buildroot}%{_datadir}/%{name}/lib/installer
+ln -s %{_javadir}/eclipse/osgi.jar %{buildroot}%{_datadir}/%{name}/lib/installer/
+ln -s %{_javadir}/%{name}/xmvn-p2-installer-plugin.jar %{buildroot}%{_datadir}/%{name}/lib/installer/
+ln -s %{_javadir}/%{name}/org.fedoraproject.xmvn.p2.jar %{buildroot}%{_datadir}/%{name}/lib/installer/
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
@@ -294,13 +298,14 @@ end
 %dir %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/bin/%{name}-install
 %{_datadir}/%{name}/lib/installer
-%exclude %{_datadir}/%{name}/lib/installer/orgi.jar
+%exclude %{_datadir}/%{name}/lib/installer/osgi.jar
 %exclude %{_datadir}/%{name}/lib/installer/xmvn-p2-installer-plugin.jar
 %exclude %{_datadir}/%{name}/lib/installer/org.fedoraproject.xmvn.p2.jar
 
 %files p2 -f .mfiles-p2
-%{_datadir}/%{name}/lib/installer/orgi.jar
+%{_datadir}/%{name}/lib/installer/osgi.jar
 %{_datadir}/%{name}/lib/installer/xmvn-p2-installer-plugin.jar
+%{_datadir}/%{name}/lib/installer/org.fedoraproject.xmvn.p2.jar
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
