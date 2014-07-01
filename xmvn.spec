@@ -1,3 +1,7 @@
+# XMvn uses OSGi environment provided by Tycho, it shouldn't require
+# any additional bundles.
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^osgi\\($
+
 Name:           xmvn
 Version:        2.0.1
 Release:        1%{?dist}
