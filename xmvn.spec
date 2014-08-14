@@ -153,8 +153,12 @@ This package provides %{summary}.
 %prep
 %setup -q
 
+# TODO: move this to javapackages-tools
+%mvn_package ::xml:p2metadata: __noinstall
+%mvn_package ::xml:p2artifacts: __noinstall
+
 %mvn_package :xmvn __noinstall
-%mvn_package :*p2*:jar: p2
+%mvn_package :*p2* p2
 
 # In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
 %mvn_alias :xmvn-connector-aether :xmvn-connector
