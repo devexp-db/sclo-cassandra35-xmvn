@@ -27,6 +27,7 @@ BuildRequires:  apache-ivy
 BuildRequires:  sisu-mojos
 BuildRequires:  junit
 BuildRequires:  tycho
+BuildRequires:  fedoraproject-p2
 
 Requires:       maven >= 3.2.2
 Requires:       xmvn-api = %{version}-%{release}
@@ -136,6 +137,7 @@ artifact installation according to specified configuration.
 %package        p2
 Summary:        XMvn P2
 Requires:       tycho >= 0.20.0
+Requires:       fedoraproject-p2
 
 %description    p2
 This package provides integration of XMvn with Eclipse Equinox
