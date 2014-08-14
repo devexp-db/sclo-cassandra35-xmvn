@@ -28,7 +28,7 @@ BuildRequires:  sisu-mojos
 BuildRequires:  junit
 BuildRequires:  tycho
 
-Requires:       maven >= 3.2.1-3
+Requires:       maven >= 3.2.2
 Requires:       xmvn-api = %{version}-%{release}
 Requires:       xmvn-connector-aether = %{version}-%{release}
 Requires:       xmvn-core = %{version}-%{release}
