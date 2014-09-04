@@ -26,8 +26,6 @@ BuildRequires:  xmlunit
 BuildRequires:  apache-ivy
 BuildRequires:  sisu-mojos
 BuildRequires:  junit
-BuildRequires:  tycho
-BuildRequires:  fedoraproject-p2
 
 Requires:       maven >= 3.2.2
 Requires:       xmvn-api = %{version}-%{release}
@@ -134,16 +132,6 @@ This package provides XMvn Install, which is a command-line interface
 to XMvn installer.  The installer reads reactor metadata and performs
 artifact installation according to specified configuration.
 
-%package        p2
-Summary:        XMvn P2
-Requires:       tycho >= 0.20.0
-Requires:       fedoraproject-p2
-
-%description    p2
-This package provides integration of XMvn with Eclipse Equinox
-P2. XMvn P2 allows Eclipse plugins and features to be installed using
-XMvn Installer.
-
 %package        javadoc
 Summary:        API documentation for %{name}
 
@@ -153,12 +141,7 @@ This package provides %{summary}.
 %prep
 %setup -q
 
-# TODO: move this to javapackages-tools
-%mvn_package ::xml:p2metadata: __noinstall
-%mvn_package ::xml:p2artifacts: __noinstall
-
 %mvn_package :xmvn __noinstall
-%mvn_package :*p2* p2
 
 # In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
 %mvn_alias :xmvn-connector-aether :xmvn-connector
@@ -224,11 +207,6 @@ EOF
 
 # make sure our conf is identical to maven so yum won't freak out
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
-
-# TODO: Move this upstream
-ln -s %{_javadir}/eclipse/osgi.jar %{buildroot}%{_datadir}/%{name}/lib/installer/
-ln -s %{_javadir}/%{name}/xmvn-p2-installer-plugin.jar %{buildroot}%{_datadir}/%{name}/lib/installer/
-ln -s %{_javadir}/%{name}/org.fedoraproject.xmvn.p2.jar %{buildroot}%{_datadir}/%{name}/lib/installer/
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
@@ -304,14 +282,6 @@ end
 %dir %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/bin/%{name}-install
 %{_datadir}/%{name}/lib/installer
-%exclude %{_datadir}/%{name}/lib/installer/osgi.jar
-%exclude %{_datadir}/%{name}/lib/installer/xmvn-p2-installer-plugin.jar
-%exclude %{_datadir}/%{name}/lib/installer/org.fedoraproject.xmvn.p2.jar
-
-%files p2 -f .mfiles-p2
-%{_datadir}/%{name}/lib/installer/osgi.jar
-%{_datadir}/%{name}/lib/installer/xmvn-p2-installer-plugin.jar
-%{_datadir}/%{name}/lib/installer/org.fedoraproject.xmvn.p2.jar
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
@@ -319,6 +289,7 @@ end
 %changelog
 * Thu Sep  4 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-1
 - Update to upstream version 2.1.0
+- Remove p2 subpackage
 
 * Fri Jun  6 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0.1-1
 - Update to upstream version 2.0.1
