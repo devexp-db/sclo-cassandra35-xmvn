@@ -1,0 +1,30 @@
+From ab7cff28c5c1d19b831a70b7eb521ca20a92d087 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 9 Sep 2014 15:26:16 +0200
+Subject: [PATCH] Avoid installing the same attached artifact twice
+
+---
+ xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+index 28c9231..4018777 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+@@ -213,9 +213,12 @@ public class InstallMojo
+             rawPomArtifact = rawPomArtifact.setPath( rawPomPath );
+             deployArtifact( rawPomArtifact, type, project.getModel() );
+ 
++            Set<Artifact> attachedArtifacts = new LinkedHashSet<>();
+             for ( org.apache.maven.artifact.Artifact mavenArtifact : project.getAttachedArtifacts() )
++                attachedArtifacts.add( aetherArtifact( mavenArtifact ) );
++
++            for ( Artifact attachedArtifact : attachedArtifacts )
+             {
+-                Artifact attachedArtifact = aetherArtifact( mavenArtifact );
+                 Path attachedArtifactPath = attachedArtifact.getPath();
+                 logger.debug( "Installing attached artifact {}", attachedArtifact );
+                 logger.debug( "Artifact file is {}", attachedArtifactPath );
+-- 
+1.9.3
+
