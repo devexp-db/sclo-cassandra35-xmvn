@@ -4,13 +4,15 @@
 
 Name:           xmvn
 Version:        2.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
 
 Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+
+Patch0:         0001-Avoid-installing-the-same-attached-artifact-twice.patch
 
 BuildRequires:  maven >= 3.2.1-10
 BuildRequires:  maven-local
@@ -140,6 +142,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %mvn_package :xmvn __noinstall
 
@@ -287,6 +290,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Sep 10 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-2
+- Avoid installing the same attached artifact twice
+
 * Thu Sep  4 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-1
 - Update to upstream version 2.1.0
 - Remove p2 subpackage
