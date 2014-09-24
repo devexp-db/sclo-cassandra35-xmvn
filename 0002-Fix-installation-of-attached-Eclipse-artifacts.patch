@@ -1,0 +1,25 @@
+From 9ff89ed35810a8dce70258c409510c647e2d2334 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 15 Sep 2014 12:50:21 +0200
+Subject: [PATCH 2/2] Fix installation of attached Eclipse artifacts
+
+---
+ xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+index 4018777..9b04d27 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+@@ -230,7 +230,7 @@ public class InstallMojo
+                     continue;
+                 }
+ 
+-                deployArtifact( attachedArtifact, null, project.getModel() );
++                deployArtifact( attachedArtifact, type, project.getModel() );
+             }
+         }
+     }
+-- 
+1.9.3
+
