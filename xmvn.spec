@@ -4,7 +4,7 @@
 
 Name:           xmvn
 Version:        2.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -159,7 +159,7 @@ This package provides %{summary}.
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
-ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
+cp -aL %{_datadir}/maven target/dependency/apache-maven-$mver
 
 # skip ITs for now (mix of old & new XMvn config causes issues)
 rm -rf src/it
@@ -211,7 +211,9 @@ exec mvn "\${@}"
 EOF
 
 # make sure our conf is identical to maven so yum won't freak out
+install -d -m 755 %{buildroot}%{_datadir}/%{name}/conf/
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{name}/conf/
+cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{name}/bin/
 
 %pretrans -p <lua>
 -- we changed symlink to dir in 0.5.0-1, workaround RPM issues
@@ -292,6 +294,9 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Oct 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-4
+- Fix FTBFS caused by new wersion of plexus-archiver
+
 * Wed Sep 24 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-3
 - Fix installation of attached Eclipse artifacts
 
