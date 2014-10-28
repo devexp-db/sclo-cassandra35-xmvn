@@ -1,0 +1,32 @@
+From f1c21784c270c4fd952bbc4773500982bb12d195 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 28 Oct 2014 16:55:25 +0100
+Subject: [PATCH 3/3] Fix conversion of Ivy to XMvn artifacts
+
+Classifiers could be lost is some cases when converting Ivy artifact
+to XMvn artifact.
+
+Resolves: rhbz#1127804
+---
+ .../main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java   | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java b/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java
+index d14e5f6..8c6a277 100644
+--- a/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java
++++ b/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java
+@@ -133,9 +133,9 @@ public class IvyResolver
+         ModuleRevisionId revision = artifact.getModuleRevisionId();
+ 
+         String groupId = revision.getOrganisation();
+-        String artifactId = revision.getName();
++        String artifactId = artifact.getName();
+         String extension = artifact.getExt();
+-        String classifier = revision.getExtraAttribute( "classifier" );
++        String classifier = artifact.getExtraAttribute( "classifier" );
+         String version = revision.getRevision();
+         String type = artifact.getType();
+ 
+-- 
+1.9.3
+

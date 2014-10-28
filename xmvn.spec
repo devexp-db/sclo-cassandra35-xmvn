@@ -4,7 +4,7 @@
 
 Name:           xmvn
 Version:        2.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -14,6 +14,7 @@ Source0:        https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar
 
 Patch0:         0001-Avoid-installing-the-same-attached-artifact-twice.patch
 Patch1:         0002-Fix-installation-of-attached-Eclipse-artifacts.patch
+Patch2:         0003-Fix-conversion-of-Ivy-to-XMvn-artifacts.patch
 
 BuildRequires:  maven >= 3.2.1-10
 BuildRequires:  maven-local
@@ -145,6 +146,7 @@ This package provides %{summary}.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %mvn_package :xmvn __noinstall
 
@@ -294,6 +296,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Oct 28 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-5
+- Fix conversion of Ivy to XMvn artifacts
+- Resolves: rhbz#1127804
+
 * Mon Oct 13 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.0-4
 - Fix FTBFS caused by new wersion of plexus-archiver
 
