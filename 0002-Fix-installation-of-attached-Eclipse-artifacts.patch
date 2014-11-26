@@ -1,7 +1,7 @@
 From 9ff89ed35810a8dce70258c409510c647e2d2334 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Mon, 15 Sep 2014 12:50:21 +0200
-Subject: [PATCH 2/3] Fix installation of attached Eclipse artifacts
+Subject: [PATCH 2/4] Fix installation of attached Eclipse artifacts
 
 ---
  xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java | 2 +-

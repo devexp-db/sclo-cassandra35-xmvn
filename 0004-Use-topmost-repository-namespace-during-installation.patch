@@ -1,0 +1,26 @@
+From 85c42732a35cdc274c4b4ab0652f7f6c0da6f3ab Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 26 Nov 2014 14:10:51 +0100
+Subject: [PATCH 4/4] Use topmost repository namespace during installation
+
+Resolves: rhbz#1166743
+---
+ .../fedoraproject/xmvn/tools/install/impl/DefaultArtifactInstaller.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultArtifactInstaller.java b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultArtifactInstaller.java
+index 8512c0e..270ddc4 100644
+--- a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultArtifactInstaller.java
++++ b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultArtifactInstaller.java
+@@ -151,7 +151,7 @@ public class DefaultArtifactInstaller
+         }
+ 
+         // Namespace
+-        am.setNamespace( repoPaths.iterator().next().getRepository().getNamespace() );
++        am.setNamespace( repo.getNamespace() );
+ 
+         // UUID
+         am.setUuid( UUID.randomUUID().toString() );
+-- 
+1.9.3
+
