@@ -1,7 +1,7 @@
 From f1c21784c270c4fd952bbc4773500982bb12d195 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Tue, 28 Oct 2014 16:55:25 +0100
-Subject: [PATCH 3/4] Fix conversion of Ivy to XMvn artifacts
+Subject: [PATCH 3/5] Fix conversion of Ivy to XMvn artifacts
 
 Classifiers could be lost is some cases when converting Ivy artifact
 to XMvn artifact.

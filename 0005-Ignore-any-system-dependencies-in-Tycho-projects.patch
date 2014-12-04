@@ -1,0 +1,49 @@
+From 280f1d580f9aa1e995ebeb5ab5f6b136714d1767 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 4 Dec 2014 12:16:04 +0100
+Subject: [PATCH 5/5] Ignore any system dependencies in Tycho projects
+
+---
+ .../main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java   | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+index 9b04d27..b59ae8b 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+@@ -59,8 +59,6 @@ public class InstallMojo
+ {
+     private static final Set<String> TYCHO_PACKAGING_TYPES = new LinkedHashSet<>();
+ 
+-    private static final Set<String> TYCHO_P2_CLASSIFIERS = new LinkedHashSet<>();
+-
+     static
+     {
+         TYCHO_PACKAGING_TYPES.add( "eclipse-plugin" );
+@@ -69,14 +67,6 @@ public class InstallMojo
+         TYCHO_PACKAGING_TYPES.add( "eclipse-update-site" );
+         TYCHO_PACKAGING_TYPES.add( "eclipse-application" );
+         TYCHO_PACKAGING_TYPES.add( "eclipse-repository" );
+-
+-        for ( String packaging : TYCHO_PACKAGING_TYPES )
+-            TYCHO_P2_CLASSIFIERS.add( "p2." + packaging );
+-    }
+-
+-    private static boolean isTychoInjectedDependency( Dependency dependency )
+-    {
+-        return TYCHO_P2_CLASSIFIERS.contains( dependency.getGroupId() );
+     }
+ 
+     private static boolean isTychoProject( MavenProject project )
+@@ -120,7 +110,7 @@ public class InstallMojo
+             for ( Dependency dependency : project.getModel().getDependencies() )
+             {
+                 // Ignore dependencies injected by Tycho
+-                if ( isTychoProject( project ) && isTychoInjectedDependency( dependency ) )
++                if ( isTychoProject( project ) )
+                     continue;
+ 
+                 if ( dependency.getScope() != null && dependency.getScope().equals( "system" ) )
+-- 
+1.9.3
+

@@ -1,7 +1,7 @@
 From 85c42732a35cdc274c4b4ab0652f7f6c0da6f3ab Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Wed, 26 Nov 2014 14:10:51 +0100
-Subject: [PATCH 4/4] Use topmost repository namespace during installation
+Subject: [PATCH 4/5] Use topmost repository namespace during installation
 
 Resolves: rhbz#1166743
 ---
