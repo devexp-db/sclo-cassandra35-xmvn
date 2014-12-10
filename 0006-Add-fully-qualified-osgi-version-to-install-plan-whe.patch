@@ -1,0 +1,62 @@
+From de6669c12a7e9bf8a9a813b2423e9c39179d64e5 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Tue, 9 Dec 2014 16:24:57 +0000
+Subject: [PATCH] Add fully qualified osgi version to install plan when tycho
+ detected.
+
+---
+ .../main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java    | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+index b59ae8b..ee2dafd 100644
+--- a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
++++ b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/InstallMojo.java
+@@ -140,13 +140,16 @@ public class InstallMojo
+         }
+     }
+ 
+-    private void deployArtifact( Artifact artifact, String type, Model model )
++    private void deployArtifact( Artifact artifact, String type, MavenProject project )
+         throws MojoExecutionException
+     {
++        Model model = project.getModel();
+         DeploymentRequest request = new DeploymentRequest();
+         request.setArtifact( artifact );
+         if ( type != null )
+             request.addProperty( "type", type );
++        if ( isTychoProject(project) )
++            request.addProperty( "qualifiedVersion", model.getProperties().getProperty( "qualifiedVersion" ) );
+ 
+         for ( Dependency dependency : model.getDependencies() )
+         {
+@@ -192,7 +195,7 @@ public class InstallMojo
+ 
+             String type = project.getPackaging();
+             if ( mainArtifactPath != null )
+-                deployArtifact( mainArtifact, type, project.getModel() );
++                deployArtifact( mainArtifact, type, project );
+ 
+             Artifact rawPomArtifact =
+                 new DefaultArtifact( mainArtifact.getGroupId(), mainArtifact.getArtifactId(), "pom",
+@@ -201,7 +204,7 @@ public class InstallMojo
+             Path rawPomPath = rawPomFile != null ? rawPomFile.toPath() : null;
+             logger.debug( "Raw POM path: {}", rawPomPath );
+             rawPomArtifact = rawPomArtifact.setPath( rawPomPath );
+-            deployArtifact( rawPomArtifact, type, project.getModel() );
++            deployArtifact( rawPomArtifact, type, project );
+ 
+             Set<Artifact> attachedArtifacts = new LinkedHashSet<>();
+             for ( org.apache.maven.artifact.Artifact mavenArtifact : project.getAttachedArtifacts() )
+@@ -220,7 +223,7 @@ public class InstallMojo
+                     continue;
+                 }
+ 
+-                deployArtifact( attachedArtifact, type, project.getModel() );
++                deployArtifact( attachedArtifact, type, project );
+             }
+         }
+     }
+-- 
+1.9.3
+
