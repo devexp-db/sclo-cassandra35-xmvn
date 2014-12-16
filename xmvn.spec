@@ -3,21 +3,21 @@
 %{?maven_find_provides_and_requires}
 
 Name:           %{?scl_prefix}%{pkg_name}
-Version:        1.3.0
-Release:        5.11%{?dist}
+Version:        2.2.0
+Release:        0.1.20141212git221a2d4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
-Source0:        https://fedorahosted.org/released/%{pkg_name}/%{pkg_name}-%{version}.tar.xz
+# git snapshot
+Source0:        xmvn-2.2.0-221a2d4.tar.bz2
 
-Patch0001:      0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
-Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
-Patch0003:      0003-Port-to-Sonatype-Sisu.patch
-Patch0004:      0004-Add-support-for-absolute-artifact-symlinks.patch
+Patch0001:      0001-Port-to-Maven-3.0.5.patch
+Patch0002:      0002-Remove-dep-on-ASM-5.patch
 
 BuildRequires:  %{?scl_prefix}maven >= 3.0.5-16.3
 BuildRequires:  %{?scl_prefix}maven-local
+BuildRequires:  %{?scl_prefix}apache-ivy
 BuildRequires:  %{?scl_prefix}beust-jcommander
 BuildRequires:  %{?scl_prefix}cglib
 BuildRequires:  %{?scl_prefix}maven-dependency-plugin
@@ -27,6 +27,7 @@ BuildRequires:  %{?scl_prefix}maven-invoker-plugin
 BuildRequires:  %{?scl_prefix}maven-plugin-plugin
 BuildRequires:  %{?scl_prefix}objectweb-asm
 BuildRequires:  %{?scl_prefix}plexus-containers-component-metadata
+BuildRequires:  %{?scl_prefix}slf4j-simple
 BuildRequires:  %{?scl_prefix}xmlunit
 
 Requires:       %{?scl_prefix}maven >= 3.0.5-14
@@ -49,8 +50,6 @@ This package provides %{summary}.
 set -e -x
 %patch0001 -p1
 %patch0002 -p1
-%patch0003 -p1
-%patch0004 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -70,7 +69,7 @@ rm -rf src/it
 %build
 %{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
-%mvn_build -X
+%mvn_build -X -f
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{pkg_name}-%{version}*
@@ -136,6 +135,9 @@ cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/co
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Dec 16 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.2.0-0.1.20141212git221a2d4
+- Update to upstream 2.2.0 snapshot
+
 * Mon May 26 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5.11
 - Mass rebuild 2014-05-26
 

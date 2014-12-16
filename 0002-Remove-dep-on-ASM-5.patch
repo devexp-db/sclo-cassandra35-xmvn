@@ -1,0 +1,84 @@
+From d0e0afe844d0a0b617f835b5b619de19a83875bb Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 16 Dec 2014 20:02:47 +0100
+Subject: [PATCH 2/2] Remove dep on ASM 5
+
+---
+ xmvn-tools/xmvn-install/pom.xml                    |  4 ---
+ .../xmvn/tools/install/impl/JarUtils.java          | 39 +---------------------
+ 2 files changed, 1 insertion(+), 42 deletions(-)
+
+diff --git a/xmvn-tools/xmvn-install/pom.xml b/xmvn-tools/xmvn-install/pom.xml
+index 6ae8257..0a9acc2 100644
+--- a/xmvn-tools/xmvn-install/pom.xml
++++ b/xmvn-tools/xmvn-install/pom.xml
+@@ -36,9 +36,5 @@
+       <groupId>org.codehaus.plexus</groupId>
+       <artifactId>plexus-utils</artifactId>
+     </dependency>
+-    <dependency>
+-      <groupId>org.ow2.asm</groupId>
+-      <artifactId>asm</artifactId>
+-    </dependency>
+   </dependencies>
+ </project>
+diff --git a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/JarUtils.java b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/JarUtils.java
+index 5dd09ea..5d1b4c8 100644
+--- a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/JarUtils.java
++++ b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/JarUtils.java
+@@ -26,10 +26,6 @@ import java.util.jar.Manifest;
+ import java.util.zip.ZipEntry;
+ import java.util.zip.ZipInputStream;
+ 
+-import org.objectweb.asm.ClassReader;
+-import org.objectweb.asm.ClassVisitor;
+-import org.objectweb.asm.MethodVisitor;
+-import org.objectweb.asm.Opcodes;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -114,40 +110,7 @@ class JarUtils
+      */
+     public static boolean usesNativeCode( Path jar )
+     {
+-        try (ZipInputStream jis = new ZipInputStream( Files.newInputStream( jar ) ))
+-        {
+-            ZipEntry ent;
+-            while ( ( ent = jis.getNextEntry() ) != null )
+-            {
+-                final String entryName = ent.getName();
+-                if ( ent.isDirectory() || !entryName.endsWith( ".class" ) )
+-                    continue;
+-
+-                new ClassReader( jis ).accept( new ClassVisitor( Opcodes.ASM5 )
+-                {
+-                    @Override
+-                    public MethodVisitor visitMethod( int flags, String name, String desc, String sig, String[] exc )
+-                    {
+-                        if ( ( flags & Opcodes.ACC_NATIVE ) != 0 )
+-                            throw new NativeMethodFound( entryName, name, sig );
+-
+-                        return super.visitMethod( flags, name, desc, sig, exc );
+-                    }
+-                }, ClassReader.SKIP_CODE );
+-            }
+-
+-            return false;
+-        }
+-        catch ( NativeMethodFound e )
+-        {
+-            logger.debug( "Native method {}({}) found in {}: {}", e.methodName, e.methodSignature, jar, e.className );
+-            return true;
+-        }
+-        catch ( IOException e )
+-        {
+-            logger.debug( "I/O exception caught when trying to determine whether JAR uses native code: {}", jar, e );
+-            return false;
+-        }
++        return false;
+     }
+ 
+     private static void putAttribute( Manifest manifest, String key, String value, String defaultValue )
+-- 
+2.1.0
+
