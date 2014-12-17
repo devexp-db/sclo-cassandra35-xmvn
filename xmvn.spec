@@ -9,34 +9,133 @@ Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
 BuildArch:      noarch
+
 # git snapshot
 Source0:        xmvn-2.2.0-221a2d4.tar.bz2
+#Source0:        https://fedorahosted.org/released/%{pkg_name}/%{pkg_name}-%{version}.tar.xz
 
 Patch0001:      0001-Port-to-Maven-3.0.5.patch
 Patch0002:      0002-Remove-dep-on-ASM-5.patch
 
-BuildRequires:  %{?scl_prefix}maven >= 3.0.5-16.3
+BuildRequires:  %{?scl_prefix}maven
 BuildRequires:  %{?scl_prefix}maven-local
-BuildRequires:  %{?scl_prefix}apache-ivy
 BuildRequires:  %{?scl_prefix}beust-jcommander
 BuildRequires:  %{?scl_prefix}cglib
 BuildRequires:  %{?scl_prefix}maven-dependency-plugin
 BuildRequires:  %{?scl_prefix}maven-plugin-build-helper
 BuildRequires:  %{?scl_prefix}maven-assembly-plugin
 BuildRequires:  %{?scl_prefix}maven-invoker-plugin
-BuildRequires:  %{?scl_prefix}maven-plugin-plugin
 BuildRequires:  %{?scl_prefix}objectweb-asm
-BuildRequires:  %{?scl_prefix}plexus-containers-component-metadata
-BuildRequires:  %{?scl_prefix}slf4j-simple
+BuildRequires:  %{?scl_prefix}modello >= 1.8.2
 BuildRequires:  %{?scl_prefix}xmlunit
+BuildRequires:  %{?scl_prefix}apache-ivy >= 2.3.0-4.8
+BuildRequires:  %{?scl_prefix}junit
+BuildRequires:  %{?scl_prefix}slf4j-simple
 
-Requires:       %{?scl_prefix}maven >= 3.0.5-14
+Requires:       %{?scl_prefix}maven
+Requires:       %{name}-api = %{version}-%{release}
+Requires:       %{name}-connector-aether = %{version}-%{release}
+Requires:       %{name}-core = %{version}-%{release}
 
 %description
 This package provides extensions for Apache Maven that can be used to
 manage system artifact repository and use it to resolve Maven
 artifacts in offline mode, as well as Maven plugins to help with
 creating RPM packages containing Maven artifacts.
+
+%package        parent-pom
+Summary:        XMvn Parent POM
+
+%description    parent-pom
+This package provides XMvn parent POM.
+
+%package        api
+Summary:        XMvn API
+
+%description    api
+This package provides XMvn API module which contains public interface
+for functionality implemented by XMvn Core.
+
+%package        launcher
+Summary:        XMvn Launcher
+
+%description    launcher
+This package provides XMvn Launcher module, which provides a way of
+launching XMvn running in isolated class realm and locating XMVn
+services.
+
+%package        core
+Summary:        XMvn Core
+
+%description    core
+This package provides XMvn Core module, which implements the essential
+functionality of XMvn such as resolution of artifacts from system
+repository.
+
+%package        connector-aether
+Summary:        XMvn Connector for Eclipse Aether
+
+%description    connector-aether
+This package provides XMvn Connector for Eclipse Aether, which
+provides integration of Eclipse Aether with XMvn.  It provides an
+adapter which allows XMvn resolver to be used as Aether workspace
+reader.
+
+%package        connector-ivy
+Summary:        XMvn Connector for Apache Ivy
+
+%description    connector-ivy
+This package provides XMvn Connector for Apache Ivy, which provides
+integration of Apache Ivy with XMvn.  It provides an adapter which
+allows XMvn resolver to be used as Ivy resolver.
+
+%package        mojo
+Summary:        XMvn MOJO
+
+%description    mojo
+This package provides XMvn MOJO, which is a Maven plugin that consists
+of several MOJOs.  Some goals of these MOJOs are intended to be
+attached to default Maven lifecycle when building packages, others can
+be called directly from Maven command line.
+
+%package        tools-pom
+Summary:        XMvn Tools POM
+
+%description    tools-pom
+This package provides XMvn Tools parent POM.
+
+%package        resolve
+Summary:        XMvn Resolver
+
+%description    resolve
+This package provides XMvn Resolver, which is a very simple
+commald-line tool to resolve Maven artifacts from system repositories.
+Basically it's just an interface to artifact resolution mechanism
+implemented by XMvn Core.  The primary intended use case of XMvn
+Resolver is debugging local artifact repositories.
+
+%package        bisect
+Summary:        XMvn Bisect
+
+%description    bisect
+This package provides XMvn Bisect, which is a debugging tool that can
+diagnose build failures by using bisection method.
+
+%package        subst
+Summary:        XMvn Subst
+
+%description    subst
+This package provides XMvn Subst, which is a tool that can substitute
+Maven artifact files with symbolic links to corresponding files in
+artifact repository.
+
+%package        install
+Summary:        XMvn Install
+
+%description    install
+This package provides XMvn Install, which is a command-line interface
+to XMvn installer.  The installer reads reactor metadata and performs
+artifact installation according to specified configuration.
 
 %package        javadoc
 Summary:        API documentation for %{pkg_name}
@@ -51,6 +150,11 @@ set -e -x
 %patch0001 -p1
 %patch0002 -p1
 
+%mvn_package :xmvn __noinstall
+
+# In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
+%mvn_alias :xmvn-connector-aether :xmvn-connector
+
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
 %pom_xpath_remove "pom:executions/pom:execution[pom:id[text()='maven-binaries']]"
@@ -59,8 +163,7 @@ set -e -x
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
-ln -s %{_datadir}/maven target/dependency/apache-maven-$mver
-
+cp -aL %{_datadir}/maven target/dependency/apache-maven-$mver
 
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
@@ -69,10 +172,13 @@ rm -rf src/it
 %build
 %{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
-%mvn_build -X -f
+# XXX some tests fail on ARM for unknown reason, see why
+%mvn_build -s -f
 
 tar --delay-directory-restore -xvf target/*tar.bz2
 chmod -R +rwX %{pkg_name}-%{version}*
+# These are installed as doc
+rm -Rf %{pkg_name}-%{version}*/{AUTHORS,README,LICENSE,NOTICE}
 %{?scl:EOF}
 
 
@@ -87,21 +193,14 @@ ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
 ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
 ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
 
-
 # helper scripts
 install -d -m 755 %{buildroot}%{_bindir}
-install -m 755 xmvn-tools/src/main/bin/tool-script \
-               %{buildroot}%{_datadir}/%{pkg_name}/bin/
-
 for tool in subst resolve bisect install;do
-    rm %{buildroot}%{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool
-    ln -s tool-script \
-          %{buildroot}%{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool
-
-    echo "#!/bin/sh -e
-exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}-$tool
+    cat <<XEOF >%{buildroot}%{_bindir}/%{pkg_name}-$tool
+#!/bin/sh -e
+exec %{_datadir}/%{pkg_name}/bin/%{pkg_name}-$tool "\${@}"
+XEOF
     chmod +x %{buildroot}%{_bindir}/%{pkg_name}-$tool
-
 done
 
 # copy over maven lib directory
@@ -110,26 +209,82 @@ cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
 
-if [[ `find %{buildroot}%{_datadir}/%{pkg_name}/lib -type f -name '*.jar' -not -name '*%{pkg_name}*' | wc -l` -ne 0 ]];then
-    echo "Some jar files were not symlinked during build. Aborting"
-    exit 1
-fi
-
 # /usr/bin/xmvn script
 echo "#!/bin/sh -e
 export M2_HOME=\"\${M2_HOME:-%{_datadir}/%{pkg_name}}\"
 exec mvn \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}
 
 # make sure our conf is identical to maven so yum won't freak out
+install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}/conf/
 cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
+cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %{?scl:EOF}
 
-%files -f .mfiles
-%{_javadir}/%{pkg_name}
+%files
+%attr(755,-,-) %{_bindir}/%{pkg_name}
+%dir %{_datadir}/%{pkg_name}/bin
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/lib/*.jar
+%{_datadir}/%{pkg_name}/lib/ext
+%{_datadir}/%{pkg_name}/bin/m2.conf
+%{_datadir}/%{pkg_name}/bin/mvn
+%{_datadir}/%{pkg_name}/bin/mvnDebug
+%{_datadir}/%{pkg_name}/bin/mvnyjp
+%{_datadir}/%{pkg_name}/bin/xmvn
+%{_datadir}/%{pkg_name}/boot
+%{_datadir}/%{pkg_name}/conf
+
+%files parent-pom -f .mfiles-xmvn-parent
+%doc LICENSE NOTICE
+
+%files launcher -f .mfiles-xmvn-launcher
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/lib/core
+
+%files core -f .mfiles-xmvn-core
+
+%files api -f .mfiles-xmvn-api
+%dir %{_javadir}/%{pkg_name}
 %doc LICENSE NOTICE
 %doc AUTHORS README
-%attr(755,-,-) %{_bindir}/*
-%{_datadir}/%{pkg_name}
+
+%files connector-aether -f .mfiles-xmvn-connector-aether
+
+%files connector-ivy -f .mfiles-xmvn-connector-ivy
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/lib/ivy
+
+%files mojo -f .mfiles-xmvn-mojo
+
+%files tools-pom -f .mfiles-xmvn-tools
+
+%files resolve -f .mfiles-xmvn-resolve
+%attr(755,-,-) %{_bindir}/%{pkg_name}-resolve
+%dir %{_datadir}/%{pkg_name}/bin
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/bin/%{pkg_name}-resolve
+%{_datadir}/%{pkg_name}/lib/resolver
+
+%files bisect -f .mfiles-xmvn-bisect
+%attr(755,-,-) %{_bindir}/%{pkg_name}-bisect
+%dir %{_datadir}/%{pkg_name}/bin
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/bin/%{pkg_name}-bisect
+%{_datadir}/%{pkg_name}/lib/bisect
+
+%files subst -f .mfiles-xmvn-subst
+%attr(755,-,-) %{_bindir}/%{pkg_name}-subst
+%dir %{_datadir}/%{pkg_name}/bin
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/bin/%{pkg_name}-subst
+%{_datadir}/%{pkg_name}/lib/subst
+
+%files install -f .mfiles-xmvn-install
+%attr(755,-,-) %{_bindir}/%{pkg_name}-install
+%dir %{_datadir}/%{pkg_name}/bin
+%dir %{_datadir}/%{pkg_name}/lib
+%{_datadir}/%{pkg_name}/bin/%{pkg_name}-install
+%{_datadir}/%{pkg_name}/lib/installer
 
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE NOTICE
