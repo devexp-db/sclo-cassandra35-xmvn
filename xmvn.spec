@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.2.0
-Release:        0.2.20141212git221a2d4%{?dist}
+Release:        0.3.20141212git221a2d4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -17,6 +17,7 @@ Source0:        xmvn-2.2.0-221a2d4.tar.bz2
 Patch0001:      0001-Port-to-Maven-3.0.5.patch
 Patch0002:      0002-Remove-dep-on-ASM-5.patch
 Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
+Patch0004:      0004-Prevent-xmvn-resolve-from-failing-in-XML-mode.patch
 
 BuildRequires:  %{?scl_prefix}maven
 BuildRequires:  %{?scl_prefix}maven-local
@@ -151,6 +152,7 @@ set -e -x
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
+%patch0004 -p1
 
 %mvn_package :xmvn __noinstall
 
@@ -292,6 +294,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Jan  2 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.2.0-0.3.20141212git221a2d4
+- Prevent xmvn-resolve from failing in XML mode
+
 * Wed Dec 17 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.2.0-0.2.20141212git221a2d4
 - Add patch for namespace support in depmap resolver
 
