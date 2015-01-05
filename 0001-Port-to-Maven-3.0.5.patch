@@ -1,7 +1,7 @@
-From bdf9569ac6620033e4b81e7cd528dfa219e21042 Mon Sep 17 00:00:00 2001
+From 1b3f82919fdd82f515abb5538dd8336d35ae62c3 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Tue, 16 Dec 2014 08:59:52 +0100
-Subject: [PATCH 1/4] Port to Maven 3.0.5
+Subject: [PATCH 1/3] Port to Maven 3.0.5
 
 Porting to Maven 3.0.5 also means migrating to some other libraries
 and technologies which are used by Maven:
@@ -83,7 +83,7 @@ and technologies which are used by Maven:
  create mode 100644 xmvn-connector-aether/src/main/java/org/fedoraproject/xmvn/connector/aether/XMvnBuildPluginManager.java
 
 diff --git a/pom.xml b/pom.xml
-index 81b3f67..d562e5a 100644
+index 5e655e0..46142c5 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -60,6 +60,16 @@
@@ -104,7 +104,7 @@ index 81b3f67..d562e5a 100644
    <build>
      <plugins>
 diff --git a/xmvn-connector-aether/pom.xml b/xmvn-connector-aether/pom.xml
-index 45f5cdb..c8b67cc 100644
+index 1597ef4..eec50d4 100644
 --- a/xmvn-connector-aether/pom.xml
 +++ b/xmvn-connector-aether/pom.xml
 @@ -54,12 +54,16 @@
@@ -629,7 +629,7 @@ index b2caf42..089c44e 100644
  /**
   * @author Mikolaj Izdebski
 diff --git a/xmvn-core/pom.xml b/xmvn-core/pom.xml
-index 997e7c3..ee0a704 100644
+index 1c1808a..2792c5b 100644
 --- a/xmvn-core/pom.xml
 +++ b/xmvn-core/pom.xml
 @@ -38,12 +38,12 @@
@@ -1439,7 +1439,7 @@ index dfa3045..8fcd5f5 100644
      private DefaultDependencyMap readDepmap( Path fragment )
          throws Exception
 diff --git a/xmvn-mojo/pom.xml b/xmvn-mojo/pom.xml
-index c2124cd..5b7fcc6 100644
+index de1a32c..1b73871 100644
 --- a/xmvn-mojo/pom.xml
 +++ b/xmvn-mojo/pom.xml
 @@ -64,12 +64,12 @@
@@ -1816,7 +1816,7 @@ index d61f8b4..b43ff81 100644
          deployed = false;
          mojo.execute();
 diff --git a/xmvn-parent/pom.xml b/xmvn-parent/pom.xml
-index 560409f..bf26fe8 100644
+index 5f7544b..5f05b06 100644
 --- a/xmvn-parent/pom.xml
 +++ b/xmvn-parent/pom.xml
 @@ -74,18 +74,18 @@
@@ -1917,7 +1917,7 @@ index 560409f..bf26fe8 100644
            </execution>
          </executions>
 diff --git a/xmvn-tools/pom.xml b/xmvn-tools/pom.xml
-index fb0060f..f0a0525 100644
+index 0a7fa5b..2ab7c00 100644
 --- a/xmvn-tools/pom.xml
 +++ b/xmvn-tools/pom.xml
 @@ -48,8 +48,8 @@
@@ -1932,7 +1932,7 @@ index fb0060f..f0a0525 100644
      <dependency>
        <groupId>org.sonatype.sisu</groupId>
 diff --git a/xmvn-tools/xmvn-bisect/pom.xml b/xmvn-tools/xmvn-bisect/pom.xml
-index 7d76113..461846f 100644
+index 5d3c649..eab5b7d 100644
 --- a/xmvn-tools/xmvn-bisect/pom.xml
 +++ b/xmvn-tools/xmvn-bisect/pom.xml
 @@ -33,8 +33,8 @@
@@ -2749,7 +2749,7 @@ index 69d2cbf..ea27bef 100644
      /**
       * Test if multiple rules are correctly aggregated into single effective rule.
 diff --git a/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/xmvn/tools/resolve/ResolverCli.java b/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/xmvn/tools/resolve/ResolverCli.java
-index e703855..c38ac0b 100644
+index 3b77a57..7592b50 100644
 --- a/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/xmvn/tools/resolve/ResolverCli.java
 +++ b/xmvn-tools/xmvn-resolve/src/main/java/org/fedoraproject/xmvn/tools/resolve/ResolverCli.java
 @@ -20,20 +20,15 @@ import java.util.Collections;
@@ -2813,7 +2813,7 @@ index e703855..c38ac0b 100644
              cli.run( cliRequest );
          }
 diff --git a/xmvn-tools/xmvn-subst/pom.xml b/xmvn-tools/xmvn-subst/pom.xml
-index 18687c2..50c9f36 100644
+index 7afdecb..336bcd2 100644
 --- a/xmvn-tools/xmvn-subst/pom.xml
 +++ b/xmvn-tools/xmvn-subst/pom.xml
 @@ -33,8 +33,8 @@

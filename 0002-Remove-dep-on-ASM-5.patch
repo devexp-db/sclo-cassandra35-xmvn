@@ -1,7 +1,7 @@
-From d0e0afe844d0a0b617f835b5b619de19a83875bb Mon Sep 17 00:00:00 2001
+From 4f1ac1311cb686f5a11f9a9d6030f9f91deeee78 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Tue, 16 Dec 2014 20:02:47 +0100
-Subject: [PATCH 2/4] Remove dep on ASM 5
+Subject: [PATCH 2/3] Remove dep on ASM 5
 
 ---
  xmvn-tools/xmvn-install/pom.xml                    |  4 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 2/4] Remove dep on ASM 5
  2 files changed, 1 insertion(+), 42 deletions(-)
 
 diff --git a/xmvn-tools/xmvn-install/pom.xml b/xmvn-tools/xmvn-install/pom.xml
-index 6ae8257..0a9acc2 100644
+index 938a9d1..e0d5b26 100644
 --- a/xmvn-tools/xmvn-install/pom.xml
 +++ b/xmvn-tools/xmvn-install/pom.xml
 @@ -36,9 +36,5 @@
