@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.2%{?dist}
+Release:        1.3%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -14,7 +14,6 @@ BuildArch:      noarch
 Source0:        https://fedorahosted.org/released/%{pkg_name}/%{pkg_name}-%{version}.tar.xz
 
 Patch0001:      0001-Port-to-Maven-3.0.5.patch
-Patch0002:      0002-Remove-dep-on-ASM-5.patch
 Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
 Patch0004:      0004-Port-to-Modello-1.7.patch
 
@@ -26,7 +25,7 @@ BuildRequires:  %{?scl_prefix}maven-dependency-plugin
 BuildRequires:  %{?scl_prefix}maven-plugin-build-helper
 BuildRequires:  %{?scl_prefix}maven-assembly-plugin
 BuildRequires:  %{?scl_prefix}maven-invoker-plugin
-BuildRequires:  %{?scl_prefix}objectweb-asm
+BuildRequires:  %{?scl_prefix_java_common}objectweb-asm5
 BuildRequires:  %{?scl_prefix}modello >= 1.7
 BuildRequires:  %{?scl_prefix}xmlunit
 BuildRequires:  %{?scl_prefix}apache-ivy >= 2.3.0-4.8
@@ -149,7 +148,6 @@ This package provides %{summary}.
 %{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %patch0001 -p1
-%patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 
@@ -293,6 +291,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Jan  7 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.3
+- Re-add dependency on ASM 5
+
 * Wed Jan  7 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.2
 - Port to Modello 1.7
 
