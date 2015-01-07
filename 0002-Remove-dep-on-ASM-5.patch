@@ -1,7 +1,7 @@
 From 4f1ac1311cb686f5a11f9a9d6030f9f91deeee78 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Tue, 16 Dec 2014 20:02:47 +0100
-Subject: [PATCH 2/3] Remove dep on ASM 5
+Subject: [PATCH 2/4] Remove dep on ASM 5
 
 ---
  xmvn-tools/xmvn-install/pom.xml                    |  4 ---
