@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.3%{?dist}
+Release:        1.4%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -151,6 +151,9 @@ set -e -x
 %patch0003 -p1
 %patch0004 -p1
 
+# XXX Disable duplicate metadata enforcing for now
+sed -i /artifactMap.remove/d $(find -name MetadataResolver.java)
+
 %mvn_package :xmvn __noinstall
 
 # In XMvn 2.x xmvn-connector was renamed to xmvn-connector-aether
@@ -291,6 +294,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Fri Jan  9 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.4
+- Disable duplicate metadata enforcing for now
+
 * Wed Jan  7 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.3
 - Re-add dependency on ASM 5
 
