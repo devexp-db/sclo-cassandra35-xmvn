@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.4%{?dist}
+Release:        1.5%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -294,6 +294,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Jan 12 2015 Michael Simacek <msimacek@redhat.com> - 2.1.1-1.5
+- Rebuild to regenerate requires from java-common
+
 * Fri Jan  9 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.4
 - Disable duplicate metadata enforcing for now
 
