@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.6%{?dist}
+Release:        1.7%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -18,7 +18,7 @@ Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
 Patch0004:      0004-Port-to-Modello-1.7.patch
 
 BuildRequires:  %{?scl_prefix}maven
-BuildRequires:  %{?scl_prefix}maven-local
+BuildRequires:  %{?scl_prefix_java_common}maven-local
 BuildRequires:  %{?scl_prefix}beust-jcommander
 BuildRequires:  %{?scl_prefix}cglib
 BuildRequires:  %{?scl_prefix}maven-dependency-plugin
@@ -29,8 +29,8 @@ BuildRequires:  %{?scl_prefix_java_common}objectweb-asm5
 BuildRequires:  %{?scl_prefix}modello >= 1.7
 BuildRequires:  %{?scl_prefix}xmlunit
 BuildRequires:  %{?scl_prefix}apache-ivy >= 2.3.0-4.8
-BuildRequires:  %{?scl_prefix}junit
-BuildRequires:  %{?scl_prefix}slf4j-simple
+BuildRequires:  %{?scl_prefix_java_common}junit
+BuildRequires:  %{?scl_prefix_java_common}slf4j-simple
 
 Requires:       %{?scl_prefix}maven
 Requires:       %{name}-api = %{version}-%{release}
@@ -294,6 +294,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jan 13 2015 Michael Simacek <msimacek@redhat.com> - 2.1.1-1.7
+- Mass rebuild 2015-01-13
+
 * Mon Jan 12 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.6
 - Rebuild to fix symlinks
 
