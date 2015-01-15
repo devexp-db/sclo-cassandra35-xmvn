@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.9%{?dist}
+Release:        1.10%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -249,6 +249,7 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 
 %files api -f .mfiles-xmvn-api
 %dir %{_javadir}/%{pkg_name}
+%dir %{_mavenpomdir}/%{pkg_name}
 %doc LICENSE NOTICE
 %doc AUTHORS README
 
@@ -294,6 +295,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Thu Jan 15 2015 Michal Srb <msrb@redhat.com> - 2.1.1-1.10
+- Fix directory ownership
+
 * Tue Jan 13 2015 Michal Srb <msrb@redhat.com> - 2.1.1-1.9
 - Rebuild to fix httpcommons symlinks
 
