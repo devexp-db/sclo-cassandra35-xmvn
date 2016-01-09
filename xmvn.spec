@@ -167,7 +167,7 @@ sed -i /artifactMap.remove/d $(find -name MetadataResolver.java)
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
-cp -aL %{_datadir}/maven target/dependency/apache-maven-$mver
+cp -aL /opt/rh/maven30/root%{_root_datadir}/maven target/dependency/apache-maven-$mver
 
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
@@ -193,9 +193,9 @@ set -e -x
 
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}
 cp -r %{pkg_name}-%{version}*/* %{buildroot}%{_datadir}/%{pkg_name}/
-ln -sf %{_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
-ln -sf %{_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
-ln -sf %{_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
+ln -sf /opt/rh/maven30/root%{_root_datadir}/maven/bin/mvn %{buildroot}%{_datadir}/%{pkg_name}/bin/mvn
+ln -sf /opt/rh/maven30/root%{_root_datadir}/maven/bin/mvnDebug %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnDebug
+ln -sf /opt/rh/maven30/root%{_root_datadir}/maven/bin/mvnyjp %{buildroot}%{_datadir}/%{pkg_name}/bin/mvnyjp
 
 # helper scripts
 install -d -m 755 %{buildroot}%{_bindir}
@@ -208,7 +208,7 @@ XEOF
 done
 
 # copy over maven lib directory
-cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
+cp -r /opt/rh/maven30/root%{_root_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
@@ -220,8 +220,8 @@ exec mvn \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}
 
 # make sure our conf is identical to maven so yum won't freak out
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}/conf/
-cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
-cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
+cp -P /opt/rh/maven30/root%{_root_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
+cp -P /opt/rh/maven30/root%{_root_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %{?scl:EOF}
 
 %files
