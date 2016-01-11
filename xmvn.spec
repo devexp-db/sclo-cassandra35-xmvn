@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.11%{?dist}
+Release:        1.12%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -17,22 +17,22 @@ Patch0001:      0001-Port-to-Maven-3.0.5.patch
 Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
 Patch0004:      0004-Port-to-Modello-1.7.patch
 
-BuildRequires:  maven30-maven
+BuildRequires:  %{?scl_prefix}maven
 BuildRequires:  %{?scl_prefix_java_common}maven-local
-BuildRequires:  maven30-beust-jcommander
-BuildRequires:  maven30-cglib
-BuildRequires:  maven30-maven-dependency-plugin
-BuildRequires:  maven30-maven-plugin-build-helper
-BuildRequires:  maven30-maven-assembly-plugin
-BuildRequires:  maven30-maven-invoker-plugin
+BuildRequires:  %{?scl_prefix}beust-jcommander
+BuildRequires:  %{?scl_prefix}cglib
+BuildRequires:  %{?scl_prefix}maven-dependency-plugin
+BuildRequires:  %{?scl_prefix}maven-plugin-build-helper
+BuildRequires:  %{?scl_prefix}maven-assembly-plugin
+BuildRequires:  %{?scl_prefix}maven-invoker-plugin
 BuildRequires:  %{?scl_prefix_java_common}objectweb-asm5
-BuildRequires:  maven30-modello >= 1.7
-BuildRequires:  maven30-xmlunit
-BuildRequires:  maven30-apache-ivy >= 2.3.0-4.8
+BuildRequires:  %{?scl_prefix}modello >= 1.7
+BuildRequires:  %{?scl_prefix}xmlunit
+BuildRequires:  %{?scl_prefix}apache-ivy >= 2.3.0-4.8
 BuildRequires:  %{?scl_prefix_java_common}junit
 BuildRequires:  %{?scl_prefix_java_common}slf4j-simple
 
-Requires:       maven30-maven
+Requires:       %{?scl_prefix}maven
 Requires:       %{name}-api = %{version}-%{release}
 Requires:       %{name}-connector-aether = %{version}-%{release}
 Requires:       %{name}-core = %{version}-%{release}
@@ -145,7 +145,7 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n %{pkg_name}-%{version}
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %patch0001 -p1
 %patch0003 -p1
@@ -174,7 +174,7 @@ rm -rf src/it
 %{?scl:EOF}
 
 %build
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 # XXX some tests fail on ARM for unknown reason, see why
 %mvn_build -s -f
@@ -187,7 +187,7 @@ rm -Rf %{pkg_name}-%{version}*/{AUTHORS,README,LICENSE,NOTICE}
 
 
 %install
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %mvn_install
 
@@ -295,6 +295,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Jan 11 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.12
+- maven33 rebuild #2
+
 * Sat Jan 09 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.11
 - maven33 rebuild
 
