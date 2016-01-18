@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.13%{?dist}
+Release:        1.14%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -315,6 +315,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Jan 18 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.14
+- Rebuild to remove asm3 symlink
+
 * Fri Jan 15 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.13
 - maven33 rebuild #3
 
