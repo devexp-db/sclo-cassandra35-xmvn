@@ -1,4 +1,4 @@
-From 655e5157c8feb93db7e38c1951265041890b707c Mon Sep 17 00:00:00 2001
+From d5bff08ac421cd707b1bfb2013757831c7599ded Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Wed, 7 Jan 2015 10:21:15 +0100
 Subject: [PATCH 4/4] Port to Modello 1.7
@@ -49,7 +49,7 @@ Subject: [PATCH 4/4] Port to Modello 1.7
  create mode 100644 xmvn-core/target/generated-sources/modello/org/fedoraproject/xmvn/metadata/io/stax/MetadataStaxWriter.java
 
 diff --git a/xmvn-core/pom.xml b/xmvn-core/pom.xml
-index 2792c5b..6c2e074 100644
+index 1c1808a..3c3f878 100644
 --- a/xmvn-core/pom.xml
 +++ b/xmvn-core/pom.xml
 @@ -85,8 +85,6 @@
@@ -8106,7 +8106,7 @@ index 0000000..36eddd4
 +
 +}
 diff --git a/xmvn-parent/pom.xml b/xmvn-parent/pom.xml
-index 5f05b06..76d32c6 100644
+index 5f7544b..9ed9ff0 100644
 --- a/xmvn-parent/pom.xml
 +++ b/xmvn-parent/pom.xml
 @@ -104,7 +104,7 @@
@@ -8119,5 +8119,5 @@ index 5f05b06..76d32c6 100644
      <projectInfoReportsPluginVersion>2.7</projectInfoReportsPluginVersion>
      <resourcesPluginVersion>2.7</resourcesPluginVersion>
 -- 
-2.1.0
+2.5.0
 

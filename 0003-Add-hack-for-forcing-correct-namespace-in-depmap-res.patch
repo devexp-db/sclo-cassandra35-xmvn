@@ -1,4 +1,4 @@
-From 27afa85ef823dcf3daef0ddeb64cf0f59fa16dc0 Mon Sep 17 00:00:00 2001
+From 5e1902673cc0e1f1003d3284bd11f0cae8c8c0e5 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Wed, 17 Dec 2014 23:31:35 +0100
 Subject: [PATCH 3/4] Add hack for forcing correct namespace in depmap resolver
@@ -8,10 +8,10 @@ Subject: [PATCH 3/4] Add hack for forcing correct namespace in depmap resolver
  1 file changed, 5 insertions(+)
 
 diff --git a/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/depmap/DepmapBasedResolver.java b/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/depmap/DepmapBasedResolver.java
-index 14f15e6..6ee377e 100644
+index 298b060..8ad228d 100644
 --- a/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/depmap/DepmapBasedResolver.java
 +++ b/xmvn-core/src/main/java/org/fedoraproject/xmvn/resolver/impl/depmap/DepmapBasedResolver.java
-@@ -199,6 +199,11 @@ public class DepmapBasedResolver
+@@ -202,6 +202,11 @@ public class DepmapBasedResolver
                      DefaultResolutionResult result = new DefaultResolutionResult( artifactPath );
                      result.setCompatVersion( version );
                      result.setNamespace( repo != null ? repo.getNamespace() : null );
@@ -24,5 +24,5 @@ index 14f15e6..6ee377e 100644
                  }
              }
 -- 
-2.1.0
+2.5.0
 

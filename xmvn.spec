@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.16%{?dist}
+Release:        1.17%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -13,6 +13,8 @@ BuildArch:      noarch
 # git snapshot
 Source0:        https://fedorahosted.org/released/%{pkg_name}/%{pkg_name}-%{version}.tar.xz
 
+Patch0001:      0001-Disable-doclint-in-javadoc-aggregate-MOJO-executions.patch
+Patch0002:      0002-Add-duplicated-ZIP-entry-hack-for-OpenJDK.patch
 Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
 Patch0004:      0004-Port-to-Modello-1.7.patch
 
@@ -147,6 +149,8 @@ This package provides %{summary}.
 %setup -q -n %{pkg_name}-%{version}
 %{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
+%patch0001 -p1
+%patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
 
@@ -294,6 +298,10 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Jan 19 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.17
+- Disable doclint in javadoc:aggregate MOJO executions
+- Add duplicated ZIP entry hack for OpenJDK
+
 * Tue Jan 19 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.16
 - Rebuild to fix classworlds symlink
 
