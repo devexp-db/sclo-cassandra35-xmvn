@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.17%{?dist}
+Release:        1.18%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -298,6 +298,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Jan 20 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.18
+- Disable javadoc doclint only on Java 8 or later
+
 * Tue Jan 19 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.17
 - Disable doclint in javadoc:aggregate MOJO executions
 - Add duplicated ZIP entry hack for OpenJDK

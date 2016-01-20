@@ -1,4 +1,4 @@
-From 0acc19cedac69be87348bd2748fd2254e46ebd43 Mon Sep 17 00:00:00 2001
+From df720cdeb86e671ac336d337dfedda1cf2d1f711 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Wed, 28 Oct 2015 13:08:23 +0100
 Subject: [PATCH 2/4] Add duplicated ZIP entry hack for OpenJDK

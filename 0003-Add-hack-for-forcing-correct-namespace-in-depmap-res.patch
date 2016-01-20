@@ -1,4 +1,4 @@
-From 5e1902673cc0e1f1003d3284bd11f0cae8c8c0e5 Mon Sep 17 00:00:00 2001
+From de97042bc5c3eaea30f6f63958e422a05b0290b0 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Wed, 17 Dec 2014 23:31:35 +0100
 Subject: [PATCH 3/4] Add hack for forcing correct namespace in depmap resolver

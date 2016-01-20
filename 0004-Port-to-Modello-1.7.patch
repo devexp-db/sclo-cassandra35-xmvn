@@ -1,4 +1,4 @@
-From d5bff08ac421cd707b1bfb2013757831c7599ded Mon Sep 17 00:00:00 2001
+From 06cbffad8f5609188a788e85991918078d9fca12 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Wed, 7 Jan 2015 10:21:15 +0100
 Subject: [PATCH 4/4] Port to Modello 1.7
