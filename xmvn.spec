@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.18%{?dist}
+Release:        1.19%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -19,7 +19,7 @@ Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
 Patch0004:      0004-Port-to-Modello-1.7.patch
 
 BuildRequires:  %{?scl_prefix}maven
-BuildRequires:  %{?scl_prefix_java_common}maven-local
+BuildRequires:  %{?scl_prefix}maven-local
 BuildRequires:  %{?scl_prefix}beust-jcommander
 BuildRequires:  %{?scl_prefix}cglib
 BuildRequires:  %{?scl_prefix}maven-dependency-plugin
@@ -298,6 +298,9 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Feb 08 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.19
+- Fix BR on maven-local & co.
+
 * Wed Jan 20 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.18
 - Disable javadoc doclint only on Java 8 or later
 
