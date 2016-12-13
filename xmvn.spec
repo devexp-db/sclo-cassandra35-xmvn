@@ -4,7 +4,7 @@
 
 Name:           %{?scl_prefix}%{pkg_name}
 Version:        2.1.1
-Release:        1.19%{?dist}
+Release:        2.20%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -17,24 +17,27 @@ Patch0001:      0001-Disable-doclint-in-javadoc-aggregate-MOJO-executions.patch
 Patch0002:      0002-Add-duplicated-ZIP-entry-hack-for-OpenJDK.patch
 Patch0003:      0003-Add-hack-for-forcing-correct-namespace-in-depmap-res.patch
 Patch0004:      0004-Port-to-Modello-1.7.patch
+Patch0005:      0005-Revert-Always-use-default-Ivy-settings.patch
 
-BuildRequires:  %{?scl_prefix}maven
-BuildRequires:  %{?scl_prefix}maven-local
-BuildRequires:  %{?scl_prefix}beust-jcommander
-BuildRequires:  %{?scl_prefix}cglib
-BuildRequires:  %{?scl_prefix}maven-dependency-plugin
-BuildRequires:  %{?scl_prefix}maven-plugin-build-helper
-BuildRequires:  %{?scl_prefix}maven-assembly-plugin
-BuildRequires:  %{?scl_prefix}maven-invoker-plugin
-BuildRequires:  %{?scl_prefix_java_common}objectweb-asm5
-BuildRequires:  %{?scl_prefix}modello >= 1.7
-BuildRequires:  %{?scl_prefix}xmlunit
-BuildRequires:  %{?scl_prefix}apache-ivy >= 2.3.0-4.8
+BuildRequires:  %{?scl_prefix_maven}maven
+BuildRequires:  %{?scl_prefix_maven}maven-local
+BuildRequires:  %{?scl_prefix_maven}beust-jcommander
+BuildRequires:  %{?scl_prefix_maven}cglib
+BuildRequires:  %{?scl_prefix_maven}maven-dependency-plugin
+BuildRequires:  %{?scl_prefix_maven}maven-plugin-build-helper
+BuildRequires:  %{?scl_prefix_maven}maven-plugin-plugin
+BuildRequires:  %{?scl_prefix_maven}maven-assembly-plugin
+BuildRequires:  %{?scl_prefix_maven}maven-invoker-plugin
+BuildRequires:  %{?scl_prefix_java_common}objectweb-asm%{?scl:5}
+BuildRequires:  %{?scl_prefix_maven}modello >= 1.7
+BuildRequires:  %{?scl_prefix_maven}xmlunit
+BuildRequires:  %{?scl_prefix_maven}apache-ivy >= 2.3.0-4.8
 BuildRequires:  %{?scl_prefix_java_common}junit
-BuildRequires:  %{?scl_prefix_java_common}slf4j-simple
-BuildRequires:  %{?scl_prefix}sisu-mojos
+BuildRequires:  %{?scl_prefix_java_common}slf4j%{?scl:-simple}
+BuildRequires:  %{?scl_prefix_maven}sisu-mojos
+BuildRequires:  %{?scl_prefix_maven}maven-site-plugin
 
-Requires:       %{?scl_prefix}maven
+Requires:       %{?scl_prefix_maven}maven
 Requires:       %{name}-api = %{version}-%{release}
 Requires:       %{name}-connector-aether = %{version}-%{release}
 Requires:       %{name}-core = %{version}-%{release}
@@ -147,12 +150,13 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n %{pkg_name}-%{version}
-%{?scl:scl enable %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl_maven} %{scl} - <<"EOF"}
 set -e -x
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
+%patch0005 -p1
 
 # XXX Disable duplicate metadata enforcing for now
 sed -i /artifactMap.remove/d $(find -name MetadataResolver.java)
@@ -170,14 +174,15 @@ sed -i /artifactMap.remove/d $(find -name MetadataResolver.java)
 mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
            xmvn-parent/pom.xml)
 mkdir -p target/dependency/
-cp -aL %{_datadir}/maven target/dependency/apache-maven-$mver
+# fix the hardcoded path TODO
+cp -aL %{?scl:/opt/rh/%{scl_maven}/root}/usr/share/maven target/dependency/apache-maven-$mver
 
 # skip ITs for now (mix of old & new XMvn config causes issues
 rm -rf src/it
 %{?scl:EOF}
 
 %build
-%{?scl:scl enable %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl_maven} %{scl} - <<"EOF"}
 set -e -x
 # XXX some tests fail on ARM for unknown reason, see why
 %mvn_build -s -f
@@ -190,7 +195,7 @@ rm -Rf %{pkg_name}-%{version}*/{AUTHORS,README,LICENSE,NOTICE}
 
 
 %install
-%{?scl:scl enable %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl_maven} %{scl} - <<"EOF"}
 set -e -x
 %mvn_install
 
@@ -211,7 +216,8 @@ XEOF
 done
 
 # copy over maven lib directory
-cp -r %{_datadir}/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
+# fix the hardcoded path TODO
+cp -r %{?scl:/opt/rh/%{scl_maven}/root}/usr/share/maven/lib/* %{buildroot}%{_datadir}/%{pkg_name}/lib/
 
 # possibly recreate symlinks that can be automated with xmvn-subst
 %{pkg_name}-subst %{buildroot}%{_datadir}/%{pkg_name}/
@@ -223,8 +229,9 @@ exec mvn \"\${@}\"" >%{buildroot}%{_bindir}/%{pkg_name}
 
 # make sure our conf is identical to maven so yum won't freak out
 install -d -m 755 %{buildroot}%{_datadir}/%{pkg_name}/conf/
-cp -P %{_datadir}/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
-cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
+# fix the hardcoded path TODO
+cp -P %{?scl:/opt/rh/%{scl_maven}/root}/usr/share/maven/conf/settings.xml %{buildroot}%{_datadir}/%{pkg_name}/conf/
+cp -P %{?scl:/opt/rh/%{scl_maven}/root}/usr/share/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %{?scl:EOF}
 
 %files
@@ -298,6 +305,12 @@ cp -P %{_datadir}/maven/bin/m2.conf %{buildroot}%{_datadir}/%{pkg_name}/bin/
 %doc LICENSE NOTICE
 
 %changelog
+* Tue Dec 13 2016 Tomas Repik <trepik@redhat.com> - 2.1.1-2.20
+- packaged into cassandra collection
+
+* Tue Oct 11 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-1.20
+- Resolves: rhbz#1383583
+
 * Mon Feb 08 2016 Michal Srb <msrb@redhat.com> - 2.1.1-1.19
 - Fix BR on maven-local & co.
 

@@ -1,0 +1,62 @@
+From e08188c2acef96aa4cbffdaa3dc1aeea8fc1e0ca Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 11 Oct 2016 09:10:36 +0200
+Subject: [PATCH 5/5] Revert "Always use default Ivy settings"
+
+This reverts commit 794f69a86efbaec6eff718376d853e8788046f07.
+---
+ .../java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java b/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java
+index fc222bc..f9c50e1 100644
+--- a/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java
++++ b/xmvn-connector-ivy/src/main/java/org/fedoraproject/xmvn/connector/ivy/IvyResolver.java
+@@ -43,7 +43,6 @@ import org.apache.ivy.core.report.MetadataArtifactDownloadReport;
+ import org.apache.ivy.core.resolve.DownloadOptions;
+ import org.apache.ivy.core.resolve.ResolveData;
+ import org.apache.ivy.core.resolve.ResolvedModuleRevision;
+-import org.apache.ivy.core.settings.IvySettings;
+ import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
+ import org.apache.ivy.plugins.parser.m2.PomModuleDescriptorParser;
+ import org.apache.ivy.plugins.parser.m2.PomModuleDescriptorWriter;
+@@ -100,8 +99,6 @@ public class IvyResolver
+         static final Deployer deployer = LazyLocatorProvider.locator.getService( Deployer.class );
+     }
+ 
+-    private final IvySettings settings = new IvySettings();
+-
+     private Resolver resolver;
+ 
+     private Deployer deployer;
+@@ -242,7 +239,7 @@ public class IvyResolver
+         if ( pomPath != null )
+         {
+             ModuleDescriptorParser parser = PomModuleDescriptorParser.getInstance();
+-            module = parser.parseDescriptor( settings, pomPath.toFile().toURI().toURL(), false );
++            module = parser.parseDescriptor( getSettings(), pomPath.toFile().toURI().toURL(), false );
+             version = resolvedVersion( result );
+         }
+         else
+@@ -303,7 +300,7 @@ public class IvyResolver
+         {
+             File ivyPath = Files.createTempFile( "xmvn-", ".ivy.xml" ).toFile();
+             ModuleDescriptorParser parser = PomModuleDescriptorParser.getInstance();
+-            ModuleDescriptor module = parser.parseDescriptor( settings, pomPath.toFile().toURI().toURL(), false );
++            ModuleDescriptor module = parser.parseDescriptor( getSettings(), pomPath.toFile().toURI().toURL(), false );
+             XmlModuleDescriptorWriter.write( module, ivyPath );
+         }
+         catch ( IOException | ParseException e )
+@@ -364,7 +361,8 @@ public class IvyResolver
+         {
+             File pomFile = Files.createTempFile( "xmvn-", ".pom" ).toFile();
+             ModuleDescriptorParser parser = XmlModuleDescriptorParser.getInstance();
+-            ModuleDescriptor module = parser.parseDescriptor( settings, artifactPath.toFile().toURI().toURL(), false );
++            ModuleDescriptor module =
++                parser.parseDescriptor( getSettings(), artifactPath.toFile().toURI().toURL(), false );
+             PomModuleDescriptorWriter.write( module, pomFile, new PomWriterOptions() );
+ 
+             org.fedoraproject.xmvn.artifact.Artifact artifact = ivy2aether( moduleRevisionId, "pom" );
+-- 
+2.7.4
+
